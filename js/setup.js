@@ -132,8 +132,10 @@ function convertData() {
             songNumber: songNumber++,
             type: songType,
             urls: {}, // Will store both video and audio links
-            activePlayers: 1,
-            totalPlayers: 1,
+            activePlayers: songData.PlayerGuessInfos 
+                ? Object.keys(songData.PlayerGuessInfos).length 
+                : 0,
+            totalPlayers: songData.PlayerGuessInfos ? Object.keys(songData.PlayerGuessInfos).length : 0,
             players: [],
             fromList: [],
             correctCount: songData.TimesCorrect || 0,
@@ -176,18 +178,16 @@ function convertData() {
         if (songData.PlayerGuessInfos) {
             for (let playerId in songData.PlayerGuessInfos) {
                 let guessInfo = songData.PlayerGuessInfos[playerId].Mst;
-                if (guessInfo) {
-                    tempSong.players.push({
-                        name: guessInfo.Username,
-                        answer: guessInfo.Guess,
-                        correct: guessInfo.IsGuessCorrect,
-                        score: 0,
-                        position: 0,
-                        positionSlot: 0,
-                        active: true
-                    });
-                    playerNames.add(guessInfo.Username);
-                }
+                tempSong.players.push({
+                    name: guessInfo.Username,
+                    answer: guessInfo.Guess || "", // Empty string if no guess
+                    correct: guessInfo.IsGuessCorrect || false,
+                    score: 0,
+                    position: 0,
+                    positionSlot: 0,
+                    active: true
+                });
+                playerNames.add(guessInfo.Username);
             }
         }
 

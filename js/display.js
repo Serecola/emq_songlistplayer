@@ -208,9 +208,11 @@ function updateInfo(song) {
         let infoRow4 = $("<div></div>")
             .attr("class", "slInfoRow");
 
-        let guesses = song.players.filter((tmpPlayer) => tmpPlayer.correct === true);
-        let guessesCount = guesses.length;
-        if (song.correctCount) guessesCount = song.correctCount;
+        let correctGuesses = song.correctCount || song.players.filter((tmpPlayer) => tmpPlayer.correct === true).length;
+		let totalPlayers = song.activePlayers;
+		let guessedPercentage = totalPlayers > 0 ? parseFloat((correctGuesses / totalPlayers * 100).toFixed(2)) : 0;
+
+		let guesses = song.players.filter(player => player.correct === true);
 
         let infoSongName = $("<div></div>")
             .attr("id", "slInfoSongName")
@@ -228,8 +230,8 @@ function updateInfo(song) {
             .attr("id", "slInfoType")
             .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
         let infoGuessed = $("<div></div>")
-            .attr("id", "slInfoGuessed")
-            .html("<h5><b>Guessed<br>" + guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount / song.activePlayers * 100).toFixed(2)) + "%)</b></h5>");
+			.attr("id", "slInfoGuessed")
+			.html("<h5><b>Guessed<br>" + correctGuesses + "/" + totalPlayers + " (" + guessedPercentage + "%)</b></h5>");
         let infoFromList = $("<div></div>")
             .attr("id", "slInfoFromList")
             .html("<h5><b>From Lists<br>" + song.fromList.length + "/" + song.totalPlayers + " (" + parseFloat((song.fromList.length / song.totalPlayers * 100).toFixed(2)) + "%)</b></h5>");
@@ -251,40 +253,40 @@ function updateInfo(song) {
 
         let infoListContainer;
         if (song.fromList.length === 0) {
-            infoGuessed.css("width", "98%");
-            infoFromList.hide();
-            if (guesses.length > 1) {
-                let infoGuessedLeft = $("<ul></ul>")
-                    .attr("id", "slInfoGuessedLeft");
-                let infoGuessedRight = $("<ul></ul>")
-                    .attr("id", "slInfoGuessedRight");
-                let i = 0;
-                for (let guessed of guesses) {
-                    if (i++ % 2 === 0) {
-                        infoGuessedLeft.append($("<li></li>")
-                            .text(guessed.name + " (" + guessed.score + ")")
-                        );
-                    }
-                    else {
-                        infoGuessedRight.append($("<li></li>")
-                            .text(guessed.name + " (" + guessed.score + ")")
-                        );
-                    }
-                }
-                infoGuessed.append(infoGuessedLeft);
-                infoGuessed.append(infoGuessedRight);
-            }
-            else {
-                infoListContainer = $("<ul></ul>")
-                    .attr("id", "slInfoGuessedList");
-                for (let guessed of guesses) {
-                    infoListContainer.append($("<li></li>")
-                        .text(guessed.name + " (" + guessed.score + ")")
-                    );
-                }
-                infoGuessed.append(infoListContainer);
-            }
-        }
+			infoGuessed.css("width", "98%");
+			infoFromList.hide();
+			if (guesses.length > 1) {
+				let infoGuessedLeft = $("<ul></ul>")
+					.attr("id", "slInfoGuessedLeft");
+				let infoGuessedRight = $("<ul></ul>")
+					.attr("id", "slInfoGuessedRight");
+				let i = 0;
+				for (let guessed of guesses) {
+					if (i++ % 2 === 0) {
+						infoGuessedLeft.append($("<li></li>")
+							.text(guessed.name + " (" + guessed.score + ")")
+						);
+					}
+					else {
+						infoGuessedRight.append($("<li></li>")
+							.text(guessed.name + " (" + guessed.score + ")")
+						);
+					}
+				}
+				infoGuessed.append(infoGuessedLeft);
+				infoGuessed.append(infoGuessedRight);
+			}
+			else if (guesses.length > 0) {
+				infoListContainer = $("<ul></ul>")
+					.attr("id", "slInfoGuessedList");
+				for (let guessed of guesses) {
+					infoListContainer.append($("<li></li>")
+						.text(guessed.name + " (" + guessed.score + ")")
+					);
+				}
+				infoGuessed.append(infoListContainer);
+			}
+		}
         else {
             infoGuessed.css("width", "");
             infoListContainer = $("<ul></ul>")
