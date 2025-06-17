@@ -1,4 +1,4 @@
-var cursong=-1;
+var cursong = -1;
 var prevsong;
 
 function loadData() {
@@ -11,12 +11,12 @@ function loadData() {
     clearInfo();
     clearScoreboard();
     $("tr.songData").remove();
-    let songid=0;
+    let songid = 0;
     for (let song of importData) {
         let guesses = song.players.filter((tmpPlayer) => tmpPlayer.correct === true);
-        let guessesCount=guesses.length;
-        if(song.correctCount) guessesCount=song.correctCount;
-        $("#slTable").append($("<tr id="+songid+"></tr>")
+        let guessesCount = guesses.length;
+        if (song.correctCount) guessesCount = song.correctCount;
+        $("#slTable").append($("<tr id=" + songid + "></tr>")
             .addClass("songData")
             .addClass("clickable")
             .append($("<td></td>")
@@ -48,7 +48,7 @@ function loadData() {
                 .addClass("playerAnswer")
             )
             .append($("<td></td>")
-                .text(guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount/song.activePlayers*100).toFixed(2)) + "%)")
+                .text(guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount / song.activePlayers * 100).toFixed(2)) + "%)")
                 .addClass("guessesCounter")
             )
             .click(function () {
@@ -57,7 +57,7 @@ function loadData() {
                     $(this).addClass("selected");
                     updateScoreboard(song);
                     updateInfo(song);
-                    repeat=repeatcount=$("#slRepeat").val()*1;
+                    repeat = repeatcount = $("#slRepeat").val() * 1;
                     repeatcount--;
                 }
                 else {
@@ -85,7 +85,7 @@ function loadData() {
         song.players.forEach((player) => {
             playerNames.add(player.name);
         });
-        song.songid=songid;
+        song.songid = songid;
         songid++;
     }
     playerNames.forEach((p1, p2) => {
@@ -135,7 +135,6 @@ function updateTableGuesses(playerName) {
                 $(".playerAnswer").hide();
             }
         }
-
     }
 }
 
@@ -184,185 +183,248 @@ function updateScoreboardHighlight(name) {
 }
 
 function updateInfo(song) {
-	var cursongdata=song;
-	cursong=song.songid;
-	$("#slInfoHeader").children().remove();
-	if($("#slPlayOrder").val() === "random") {
-		$("#slInfoHeader").append("<h2>Previous Song Info</h2>");
-		if(prevsong!==undefined) song=importData[prevsong];
-		else song=undefined;
-	    prevsong=cursong;
-
-	}
-	else {
-		$("#slInfoHeader").append("<h2>Song Info</h2>");
-		prevsong=undefined;
-	}
-	stopsong();
+    var cursongdata = song;
+    cursong = song.songid;
+    $("#slInfoHeader").children().remove();
+    if ($("#slPlayOrder").val() === "random") {
+        $("#slInfoHeader").append("<h2>Previous Song Info</h2>");
+        if (prevsong !== undefined) song = importData[prevsong];
+        else song = undefined;
+        prevsong = cursong;
+    }
+    else {
+        $("#slInfoHeader").append("<h2>Song Info</h2>");
+        prevsong = undefined;
+    }
+    stopsong();
     clearInfo();
-    if(song!==undefined) {
-	    let infoRow1 = $("<div></div>")
-	        .attr("class", "slInfoRow");
-	    let infoRow2 = $("<div></div>")
-	        .attr("class", "slInfoRow");
-	    let infoRow3 = $("<div></div>")
-	        .attr("class", "slInfoRow");
-	    let infoRow4 = $("<div></div>")
-	        .attr("class", "slInfoRow");
-	    
-	    let guesses = song.players.filter((tmpPlayer) => tmpPlayer.correct === true);
-        let guessesCount=guesses.length;
-        if(song.correctCount) guessesCount=song.correctCount;
+    if (song !== undefined) {
+        let infoRow1 = $("<div></div>")
+            .attr("class", "slInfoRow");
+        let infoRow2 = $("<div></div>")
+            .attr("class", "slInfoRow");
+        let infoRow3 = $("<div></div>")
+            .attr("class", "slInfoRow");
+        let infoRow4 = $("<div></div>")
+            .attr("class", "slInfoRow");
 
-	    let infoSongName = $("<div></div>")
-	        .attr("id", "slInfoSongName")
-	        .html("<h5><b>Song Name</b></h5><p>" + song.name + "</p>");
-	    let infoArtist = $("<div></div>")
-	        .attr("id", "slInfoArtist")
-	        .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
-	    let infoVNEnglish = $("<div></div>")
-	        .attr("id", "slInfoVNEnglish")
-	        .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
-	    let infoVNRomaji = $("<div></div>")
-	        .attr("id", "slInfoVNRomaji")
-	        .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
-	    let infoType = $("<div></div>")
-	        .attr("id", "slInfoType")
-	        .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
-	    let infoGuessed = $("<div></div>")
-	        .attr("id", "slInfoGuessed")
-	        .html("<h5><b>Guessed<br>" + guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount/song.activePlayers*100).toFixed(2)) + "%)</b></h5>");
-	    let infoFromList = $("<div></div>")
-	        .attr("id", "slInfoFromList")
-	        .html("<h5><b>From Lists<br>" + song.fromList.length + "/" + song.totalPlayers + " (" + parseFloat((song.fromList.length/song.totalPlayers*100).toFixed(2)) + "%)</b></h5>");
-	    let infoUrls = $("<div></div>")
-	        .attr("id", "slInfoUrls")
-	        .html("<h5><b>URLs</b></h5>");
+        let guesses = song.players.filter((tmpPlayer) => tmpPlayer.correct === true);
+        let guessesCount = guesses.length;
+        if (song.correctCount) guessesCount = song.correctCount;
 
-	    infoRow1.append(infoSongName);
-	    infoRow1.append(infoArtist);
-	    infoRow1.append(infoType);
+        let infoSongName = $("<div></div>")
+            .attr("id", "slInfoSongName")
+            .html("<h5><b>Song Name</b></h5><p>" + song.name + "</p>");
+        let infoArtist = $("<div></div>")
+            .attr("id", "slInfoArtist")
+            .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
+        let infoVNEnglish = $("<div></div>")
+            .attr("id", "slInfoVNEnglish")
+            .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
+        let infoVNRomaji = $("<div></div>")
+            .attr("id", "slInfoVNRomaji")
+            .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
+        let infoType = $("<div></div>")
+            .attr("id", "slInfoType")
+            .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
+        let infoGuessed = $("<div></div>")
+            .attr("id", "slInfoGuessed")
+            .html("<h5><b>Guessed<br>" + guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount / song.activePlayers * 100).toFixed(2)) + "%)</b></h5>");
+        let infoFromList = $("<div></div>")
+            .attr("id", "slInfoFromList")
+            .html("<h5><b>From Lists<br>" + song.fromList.length + "/" + song.totalPlayers + " (" + parseFloat((song.fromList.length / song.totalPlayers * 100).toFixed(2)) + "%)</b></h5>");
+        let infoUrls = $("<div></div>")
+            .attr("id", "slInfoUrls")
+            .html("<h5><b>URLs</b></h5>");
 
-	    infoRow2.append(infoVNEnglish);
-	    infoRow2.append(infoVNRomaji);
+        infoRow1.append(infoSongName);
+        infoRow1.append(infoArtist);
+        infoRow1.append(infoType);
 
-	    infoRow3.append(infoUrls);
+        infoRow2.append(infoVNEnglish);
+        infoRow2.append(infoVNRomaji);
 
-	    infoRow4.append(infoGuessed);
-	    infoRow4.append(infoFromList);
+        infoRow3.append(infoUrls);
 
-	    let infoListContainer;
-	    if (song.fromList.length === 0) {
-	        infoGuessed.css("width", "98%");
-	        infoFromList.hide();
-	        if (guesses.length > 1) {
-	            let infoGuessedLeft = $("<ul></ul>")
-	                .attr("id", "slInfoGuessedLeft");
-	            let infoGuessedRight = $("<ul></ul>")
-	                .attr("id", "slInfoGuessedRight");
-	            let i = 0;
-	            for (let guessed of guesses) {
-	                if (i++ % 2 === 0) {
-	                    infoGuessedLeft.append($("<li></li>")
-	                        .text(guessed.name + " (" + guessed.score + ")")
-	                    );
-	                }
-	                else {
-	                    infoGuessedRight.append($("<li></li>")
-	                        .text(guessed.name + " (" + guessed.score + ")")
-	                    );
-	                }
-	            }
-	            infoGuessed.append(infoGuessedLeft);
-	            infoGuessed.append(infoGuessedRight);
-	        }
-	        else {
-	            infoListContainer = $("<ul></ul>")
-	                .attr("id", "slInfoGuessedList");
-	            for (let guessed of guesses) {
-	                infoListContainer.append($("<li></li>")
-	                    .text(guessed.name + " (" + guessed.score + ")")
-	                );
-	            }
-	            infoGuessed.append(infoListContainer);
-	        }
-	    }
-	    else {
-	        infoGuessed.css("width", "");
-	        infoListContainer = $("<ul></ul>")
-	            .attr("id", "slInfoGuessedList");
-	        infoFromList.show();
-	        for (let guessed of guesses) {
-	            infoListContainer.append($("<li></li>")
-	                .text(guessed.name + " (" + guessed.score + ")")
-	            );
-	        }
-	        infoGuessed.append(infoListContainer);
-	    }
-	    let listStatus = {
-	        1: "Watching",
-	        2: "Completed",
-	        3: "On-Hold",
-	        4: "Dropped",
-	        5: "Plan to Watch",
-	        6: "Looted"
-	    };
+        infoRow4.append(infoGuessed);
+        infoRow4.append(infoFromList);
 
-	    infoListContainer = $("<ul></ul>");
-	    for (let fromList of song.fromList) {
-	        infoListContainer.append($("<li></li>")
-	            .text(fromList.name + " (" + listStatus[fromList.listStatus] + ((fromList.score !== null) ? ", " + fromList.score + ")" : ")"))
-	        );
-	    }
-	    infoFromList.append(infoListContainer);
+        let infoListContainer;
+        if (song.fromList.length === 0) {
+            infoGuessed.css("width", "98%");
+            infoFromList.hide();
+            if (guesses.length > 1) {
+                let infoGuessedLeft = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedLeft");
+                let infoGuessedRight = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedRight");
+                let i = 0;
+                for (let guessed of guesses) {
+                    if (i++ % 2 === 0) {
+                        infoGuessedLeft.append($("<li></li>")
+                            .text(guessed.name + " (" + guessed.score + ")")
+                        );
+                    }
+                    else {
+                        infoGuessedRight.append($("<li></li>")
+                            .text(guessed.name + " (" + guessed.score + ")")
+                        );
+                    }
+                }
+                infoGuessed.append(infoGuessedLeft);
+                infoGuessed.append(infoGuessedRight);
+            }
+            else {
+                infoListContainer = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedList");
+                for (let guessed of guesses) {
+                    infoListContainer.append($("<li></li>")
+                        .text(guessed.name + " (" + guessed.score + ")")
+                    );
+                }
+                infoGuessed.append(infoListContainer);
+            }
+        }
+        else {
+            infoGuessed.css("width", "");
+            infoListContainer = $("<ul></ul>")
+                .attr("id", "slInfoGuessedList");
+            infoFromList.show();
+            for (let guessed of guesses) {
+                infoListContainer.append($("<li></li>")
+                    .text(guessed.name + " (" + guessed.score + ")")
+                );
+            }
+            infoGuessed.append(infoListContainer);
+        }
+        let listStatus = {
+            1: "Watching",
+            2: "Completed",
+            3: "On-Hold",
+            4: "Dropped",
+            5: "Plan to Watch",
+            6: "Looted"
+        };
 
-	    infoListContainer = $("<ul></ul>");
-	    for (let host in song.urls) {
-	        for (let resolution in song.urls[host]) {
-	            let url = formatUrl(song.urls[host][resolution]);
-	            let innerHTML = "";
-	            innerHTML += (host === "catbox" ? "Catbox " : (host === "animethemes" ? "AnimeThemes " : "OpeningsMoe "));
-	            innerHTML += (resolution === "0") ? "MP3: " : (resolution === "480") ? "480p: " : "720p: ";
-	            innerHTML += "<a href=\"" + url + "\" target=\"_blank\">" + url + "</a>";
-	            infoListContainer.append($("<li></li>")
-	                .html(innerHTML)
-	            );
-	        }
-	    }
-	    infoUrls.append(infoListContainer);
+        infoListContainer = $("<ul></ul>");
+        for (let fromList of song.fromList) {
+            infoListContainer.append($("<li></li>")
+                .text(fromList.name + " (" + listStatus[fromList.listStatus] + ((fromList.score !== null) ? ", " + fromList.score + ")" : ")"))
+            );
+        }
+        infoFromList.append(infoListContainer);
 
-	    $("#slInfoBody").append(infoRow1);
-	    $("#slInfoBody").append(infoRow2);
-	    $("#slInfoBody").append(infoRow3);
-	    $("#slInfoBody").append(infoRow4);
-	}
-    song=cursongdata;
+		// Updated URL display section
+		infoListContainer = $("<ul></ul>").attr("id", "slInfoUrlList");
 
-	var length= parseInt($("#slLength").val());
-
-	let reslist=["0","480","720"];
-	let hostlist=["catbox","animethemes","openingsmoe"]
-	if (autoplay) {
-		for(let res of reslist) {
-			for(let host of hostlist) {
-				if(song.urls[host]!==undefined) {
-					if(song.urls[host][res]!==undefined) {
-						var starttime=0;
-						if($("#slSample").val() === "random") starttime = Math.random()*(song.videoLength-length-5);
-						else if($("#slSample").val() === "start") starttime = .2;
-						else if($("#slSample").val() === "mid") starttime = (song.videoLength-length)*.5;
-						else if($("#slSample").val() === "end") starttime = song.videoLength-length-5;
-						else if($("#slSample").val() === "recorded") starttime = song.startSample;
-						if(starttime<0) starttime=0;
-						play(song.urls[host][res],starttime);
-						return;
-					}
-				}
+		// Helper function to parse duration in seconds for comparison
+		function parseDuration(durationStr) {
+			if (!durationStr) return 0;
+			const parts = durationStr.split(':');
+			if (parts.length >= 3) {
+				const hh = parseInt(parts[0]) || 0;
+				const mm = parseInt(parts[1]) || 0;
+				const ss = parseFloat(parts[2]) || 0;
+				return hh * 3600 + mm * 60 + ss;
 			}
+			return 0;
 		}
-	}
+
+		// Helper function to format duration as MM:SS
+		function formatDuration(durationStr) {
+			if (!durationStr) return "";
+			const parts = durationStr.split(':');
+			if (parts.length >= 3) {
+				const seconds = parts[2].split('.')[0];
+				return `${parts[1]}:${seconds.padStart(2, '0')}`;
+			}
+			return durationStr;
+		}
+
+		if (song.links && song.links.length > 0) {
+			// Find shortest video link
+			const videoLinks = song.links.filter(link => link.IsVideo);
+			const shortestVideo = videoLinks.reduce((shortest, current) => {
+				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
+			}, videoLinks[0]);
+
+			// Find shortest audio link
+			const audioLinks = song.links.filter(link => !link.IsVideo);
+			const shortestAudio = audioLinks.reduce((shortest, current) => {
+				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
+			}, audioLinks[0]);
+
+			// Display shortest video link if exists
+			if (shortestVideo) {
+				infoListContainer.append(
+					$("<li></li>").append(
+						$("<span></span>").text("Video: "),
+						$("<a></a>")
+							.attr("href", shortestVideo.Url)
+							.attr("target", "_blank")
+							.text(shortestVideo.Url),
+						$("<span></span>").text(` (${formatDuration(shortestVideo.Duration)})`)
+					)
+				);
+			}
+
+			// Display shortest audio link if exists
+			if (shortestAudio) {
+				infoListContainer.append(
+					$("<li></li>").append(
+						$("<span></span>").text("Audio: "),
+						$("<a></a>")
+							.attr("href", shortestAudio.Url)
+							.attr("target", "_blank")
+							.text(shortestAudio.Url),
+						$("<span></span>").text(` (${formatDuration(shortestAudio.Duration)})`)
+					)
+				);
+			}
+
+			if (!shortestVideo && !shortestAudio) {
+				infoListContainer.append(
+					$("<li></li>").text("No media links available")
+				);
+			}
+		} else {
+			infoListContainer.append(
+				$("<li></li>").text("No media links available")
+			);
+		}
+		infoUrls.append(infoListContainer);
+
+        $("#slInfoBody").append(infoRow1);
+        $("#slInfoBody").append(infoRow2);
+        $("#slInfoBody").append(infoRow3);
+        $("#slInfoBody").append(infoRow4);
+    }
+    song = cursongdata;
+
+    var length = parseInt($("#slLength").val());
+
+    let reslist = ["0", "480", "720"];
+    let hostlist = ["catbox", "animethemes", "openingsmoe"]
+    if (autoplay) {
+        for (let res of reslist) {
+            for (let host of hostlist) {
+                if (song.urls[host] !== undefined) {
+                    if (song.urls[host][res] !== undefined) {
+                        var starttime = 0;
+                        if ($("#slSample").val() === "random") starttime = Math.random() * (song.videoLength - length - 5);
+                        else if ($("#slSample").val() === "start") starttime = .2;
+                        else if ($("#slSample").val() === "mid") starttime = (song.videoLength - length) * .5;
+                        else if ($("#slSample").val() === "end") starttime = song.videoLength - length - 5;
+                        if (starttime < 0) starttime = 0;
+                        play(song.urls[host][res], starttime);
+                        return;
+                    }
+                }
+            }
+        }
+    }
 }
-var nextsongtimer=null;
+var nextsongtimer = null;
 
 function clearInfo() {
     $("#slInfoBody").children().remove();
@@ -373,52 +435,52 @@ function clearScoreboard() {
 }
 
 function formatUrl(src) {
-	return src?"https://"+$("#slHost").val()+"/"+(src.replace(/^.*\//, '')):src;
+    return src ? "https://" + $("#slHost").val() + "/" + (src.replace(/^.*\//, '')) : src;
 }
 
 function play(song, starttime) {
     var videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.src = formatUrl(song);
-    videoPlayer.currentTime=starttime;
+    videoPlayer.currentTime = starttime;
     videoPlayer.play();
 }
 
-let repeat=0;
-var repeatcount=0;
+let repeat = 0;
+var repeatcount = 0;
 function playnextsong() {
-	repeat=$("#slRepeat").val()*1;
-	var nextindex;
-	if(repeat>0 && repeatcount>0) {
-		var index=playlist.findIndex((x)=>x==cursong);
-		nextindex=playlist[index];
-	}
-	else if($("#slPlayOrder").val() === "random") {
-		nextindex=playlist[getRandomInt(playlist.length)];
-		if(repeat>0) repeatcount=repeat;
-	}
-	else {
-		var index=playlist.findIndex((x)=>x==cursong);
-		if(index<playlist.length-1) index++; else index=0;
-		nextindex=playlist[index];
-		if(repeat>0) repeatcount=repeat;
-	}
-	if(repeat>0) repeatcount--;
-	playsong(nextindex);
+    repeat = $("#slRepeat").val() * 1;
+    var nextindex;
+    if (repeat > 0 && repeatcount > 0) {
+        var index = playlist.findIndex((x) => x == cursong);
+        nextindex = playlist[index];
+    }
+    else if ($("#slPlayOrder").val() === "random") {
+        nextindex = playlist[getRandomInt(playlist.length)];
+        if (repeat > 0) repeatcount = repeat;
+    }
+    else {
+        var index = playlist.findIndex((x) => x == cursong);
+        if (index < playlist.length - 1) index++; else index = 0;
+        nextindex = playlist[index];
+        if (repeat > 0) repeatcount = repeat;
+    }
+    if (repeat > 0) repeatcount--;
+    playsong(nextindex);
 }
 function stopsong() {
     var videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.pause();
-    if(nextsongtimer!=null) clearTimeout(nextsongtimer);
-    nextsongtimer=null;
+    if (nextsongtimer != null) clearTimeout(nextsongtimer);
+    nextsongtimer = null;
 }
 
 function playsong(index) {
-	$(".selected").removeClass("selected");
-	$($("tr.songData").get(index)).addClass("selected");
-	$("#slTableBody").scrollTop($(".songData.selected").position().top);
-	updateScoreboard(importData[index]);
-	updateInfo(importData[index]);
+    $(".selected").removeClass("selected");
+    $($("tr.songData").get(index)).addClass("selected");
+    $("#slTableBody").scrollTop($(".songData.selected").position().top);
+    updateScoreboard(importData[index]);
+    updateInfo(importData[index]);
 }
 function getRandomInt(max) {
-  return Math.floor(Math.random() * Math.floor(max));
+    return Math.floor(Math.random() * Math.floor(max));
 }

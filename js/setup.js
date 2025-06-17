@@ -116,7 +116,7 @@ function convertData() {
         
         // Get English and Romaji titles
         let englishTitle = song.Sources[0].Titles.find(t => t.Language === "en")?.LatinTitle || "";
-        let romajiTitle = song.Sources[0].Titles[0].LatinTitle;
+        let romajiTitle = song.Sources[0].Titles.find(t => t.Language === "ja")?.LatinTitle || song.Sources[0].Titles[0].LatinTitle;
         
         let tempSong = {
             gameMode: "Standard",
@@ -125,45 +125,50 @@ function convertData() {
                 .filter(a => a.Roles && a.Roles.includes("Vocals"))
                 .map(a => a.Titles[0].LatinTitle)
                 .join(", "),
-            visualnovel: {  // Changed from anime to visualnovel and fixed structure
+            visualnovel: {
                 english: englishTitle,
                 romaji: romajiTitle
             },
             songNumber: songNumber++,
             type: songType,
-            urls: {},
+            urls: {}, // Will store both video and audio links
             activePlayers: 1,
             totalPlayers: 1,
             players: [],
             fromList: [],
             correctCount: songData.TimesCorrect || 0,
             videoLength: 0,
-            startSample: 0
+            startSample: 0,
+            // Store all Self links for display
+            links: []
         };
 
-        // Process links - only accept "Self" type and find shortest duration
+        // Process links - find all Self links and store them
         if (song.Links && song.Links.length) {
-            let validLinks = song.Links.filter(link => link.Type === "Self" && link.IsFileLink);
+            // Store all Self links for display
+            tempSong.links = song.Links.filter(link => link.Type === "Self" && link.IsFileLink);
             
-            if (validLinks.length > 0) {
-                // Find the shortest duration link
-                let shortestLink = validLinks.reduce((prev, current) => {
-                    let prevDuration = parseDuration(prev.Duration);
-                    let currentDuration = parseDuration(current.Duration);
-                    return (prevDuration < currentDuration) ? prev : current;
-                });
-
-                // Assign the shortest link based on whether it's video or audio
-                if (shortestLink.IsVideo) {
-                    tempSong.urls.catbox = tempSong.urls.catbox || {};
-                    tempSong.urls.catbox["720"] = shortestLink.Url;
-                } else {
-                    tempSong.urls.catbox = tempSong.urls.catbox || {};
-                    tempSong.urls.catbox["0"] = shortestLink.Url;
+            // Find shortest video and audio links for playback
+            let videoLinks = tempSong.links.filter(link => link.IsVideo);
+            let audioLinks = tempSong.links.filter(link => !link.IsVideo);
+            
+            if (videoLinks.length > 0) {
+                let shortestVideo = videoLinks.reduce((prev, current) => 
+                    parseDuration(prev.Duration) < parseDuration(current.Duration) ? prev : current
+                );
+                tempSong.urls.video = shortestVideo.Url;
+                tempSong.videoLength = parseDuration(shortestVideo.Duration);
+            }
+            
+            if (audioLinks.length > 0) {
+                let shortestAudio = audioLinks.reduce((prev, current) => 
+                    parseDuration(prev.Duration) < parseDuration(current.Duration) ? prev : current
+                );
+                tempSong.urls.audio = shortestAudio.Url;
+                // Only set videoLength from video if available, otherwise use audio
+                if (!tempSong.videoLength) {
+                    tempSong.videoLength = parseDuration(shortestAudio.Duration);
                 }
-
-                // Set the video length from the shortest link
-                tempSong.videoLength = parseDuration(shortestLink.Duration);
             }
         }
 
