@@ -403,26 +403,53 @@ function updateInfo(song) {
 
     var length = parseInt($("#slLength").val());
 
-    let reslist = ["0", "480", "720"];
-    let hostlist = ["catbox", "animethemes", "openingsmoe"]
     if (autoplay) {
-        for (let res of reslist) {
-            for (let host of hostlist) {
-                if (song.urls[host] !== undefined) {
-                    if (song.urls[host][res] !== undefined) {
-                        var starttime = 0;
-                        if ($("#slSample").val() === "random") starttime = Math.random() * (song.videoLength - length - 5);
-                        else if ($("#slSample").val() === "start") starttime = .2;
-                        else if ($("#slSample").val() === "mid") starttime = (song.videoLength - length) * .5;
-                        else if ($("#slSample").val() === "end") starttime = song.videoLength - length - 5;
-                        if (starttime < 0) starttime = 0;
-                        play(song.urls[host][res], starttime);
-                        return;
-                    }
-                }
-            }
-        }
-    }
+    // Find all audio links
+    const audioLinks = song.links.filter(link => !link.IsVideo);
+		
+		if (audioLinks.length > 0) {
+			// Find the shortest audio link
+			const shortestAudio = audioLinks.reduce((shortest, current) => {
+				const shortestDuration = parseDuration(shortest.Duration);
+				const currentDuration = parseDuration(current.Duration);
+				return currentDuration < shortestDuration ? current : shortest;
+			});
+			
+			var length = parseInt($("#slLength").val());
+			var starttime = 0;
+			if ($("#slSample").val() === "random") {
+				starttime = Math.random() * (parseDuration(shortestAudio.Duration) - length - 5);
+				if (starttime < 0) starttime = 0;
+			} else if ($("#slSample").val() === "start") {
+				starttime = 0.2;
+			} else if ($("#slSample").val() === "mid") {
+				starttime = (parseDuration(shortestAudio.Duration) - length) * 0.5;
+			} else if ($("#slSample").val() === "end") {
+				starttime = parseDuration(shortestAudio.Duration) - length - 5;
+			}
+			if (starttime < 0) starttime = 0;
+			
+			play(shortestAudio.Url, starttime);
+		} else {
+			// Fallback to video if no audio available
+			for (let res of reslist) {
+				for (let host of hostlist) {
+					if (song.urls[host] !== undefined) {
+						if (song.urls[host][res] !== undefined) {
+							var starttime = 0;
+							if ($("#slSample").val() === "random") starttime = Math.random() * (song.videoLength - length - 5);
+							else if ($("#slSample").val() === "start") starttime = .2;
+							else if ($("#slSample").val() === "mid") starttime = (song.videoLength - length) * .5;
+							else if ($("#slSample").val() === "end") starttime = song.videoLength - length - 5;
+							if (starttime < 0) starttime = 0;
+							play(song.urls[host][res], starttime);
+							return;
+						}
+					}
+				}
+			}
+		}
+	}
 }
 var nextsongtimer = null;
 
@@ -438,12 +465,40 @@ function formatUrl(src) {
     return src ? "https://" + $("#slHost").val() + "/" + (src.replace(/^.*\//, '')) : src;
 }
 
-function play(song, starttime) {
-    var videoPlayer = document.getElementById('videoPlayer');
-    videoPlayer.src = formatUrl(song);
-    videoPlayer.currentTime = starttime;
-    videoPlayer.play();
+let currentAudio = null;
+
+function play(url, starttime) {
+    // Stop any currently playing audio first
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+    }
+    
+    // Create new audio element
+    currentAudio = document.getElementById('videoPlayer');
+    currentAudio.src = url;
+    currentAudio.currentTime = starttime;
+    
+    // Handle potential play errors
+    const playPromise = currentAudio.play();
+    
+    if (playPromise !== undefined) {
+        playPromise.catch(error => {
+            console.error("Playback failed:", error);
+            // Try falling back to video if audio fails
+            if (url.includes('.mp3') || url.includes('.weba')) {
+                const videoLinks = song.links.filter(link => link.IsVideo);
+                if (videoLinks.length > 0) {
+                    const shortestVideo = videoLinks.reduce((shortest, current) => 
+                        parseDuration(shortest.Duration) < parseDuration(current.Duration) ? shortest : current
+                    );
+                    play(shortestVideo.Url, starttime);
+                }
+            }
+        });
+    }
 }
+
 
 let repeat = 0;
 var repeatcount = 0;
