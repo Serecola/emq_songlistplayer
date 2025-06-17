@@ -93,34 +93,44 @@ function uploadFiles(e){
 function convertData() {
     if (!importData || typeof importData !== 'object') return;
     
-    // Convert the EMQ export format to our internal format
     let tempData = [];
     let songNumber = 1;
-    
-    // EMQ export is an object with numeric keys, convert to array
     let songsArray = Object.values(importData);
     
     for (let songData of songsArray) {
         if (!songData.Song) continue;
         
         let song = songData.Song;
+        
+        // Get song type from Sources[0].MusicIds or Sources[0].SongTypes
+        let songType = "Unknown";
+        if (song.Sources && song.Sources.length > 0) {
+            const source = song.Sources[0];
+            if (source.MusicIds && source.MusicIds[song.Id]) {
+                songType = source.MusicIds[song.Id][0];
+            } 
+            else if (source.SongTypes && source.SongTypes.length > 0) {
+                songType = source.SongTypes[0];
+            }
+        }
+        
+        // Get English and Romaji titles
+        let englishTitle = song.Sources[0].Titles.find(t => t.Language === "en")?.LatinTitle || "";
+        let romajiTitle = song.Sources[0].Titles[0].LatinTitle;
+        
         let tempSong = {
             gameMode: "Standard",
             name: song.Titles[0].LatinTitle,
             artist: song.Artists
-                .filter(a => a.Roles && a.Roles.includes("Vocals")) // Filter artists by 'Vocals' role
+                .filter(a => a.Roles && a.Roles.includes("Vocals"))
                 .map(a => a.Titles[0].LatinTitle)
                 .join(", "),
-            visualnovel: {
-                english: song.Sources[0].Titles.find(t => t.Language === "en")?.LatinTitle || "",
-                romaji: song.Sources[0].Titles[0].LatinTitle
+            visualnovel: {  // Changed from anime to visualnovel and fixed structure
+                english: englishTitle,
+                romaji: romajiTitle
             },
             songNumber: songNumber++,
-            type: song.Sources[0].SongTypes && song.Sources[0].SongTypes.length > 0 ? 
-                song.Sources[0].SongTypes[0] : 
-                (song.Sources[0].MusicIds && song.Sources[0].MusicIds[song.Id] ? 
-                song.Sources[0].MusicIds[song.Id][0] : 
-                "Unknown"),
+            type: songType,
             urls: {},
             activePlayers: 1,
             totalPlayers: 1,
@@ -131,26 +141,29 @@ function convertData() {
             startSample: 0
         };
 
-        // Process links
+        // Process links - only accept "Self" type and find shortest duration
         if (song.Links && song.Links.length) {
-            for (let link of song.Links) {
-                if (link.Type === "Catbox" || link.Type === "Self") {
-                    if (link.IsVideo) {
-                        tempSong.urls.catbox = tempSong.urls.catbox || {};
-                        tempSong.urls.catbox["720"] = link.Url;
-                    } else {
-                        tempSong.urls.catbox = tempSong.urls.catbox || {};
-                        tempSong.urls.catbox["0"] = link.Url;
-                    }
-                }
-            }
-        }
+            let validLinks = song.Links.filter(link => link.Type === "Self" && link.IsFileLink);
+            
+            if (validLinks.length > 0) {
+                // Find the shortest duration link
+                let shortestLink = validLinks.reduce((prev, current) => {
+                    let prevDuration = parseDuration(prev.Duration);
+                    let currentDuration = parseDuration(current.Duration);
+                    return (prevDuration < currentDuration) ? prev : current;
+                });
 
-        // Get duration from the first link that has it
-        if (song.Links && song.Links.length) {
-            let linkWithDuration = song.Links.find(l => l.Duration);
-            if (linkWithDuration) {
-                tempSong.videoLength = parseDuration(linkWithDuration.Duration);
+                // Assign the shortest link based on whether it's video or audio
+                if (shortestLink.IsVideo) {
+                    tempSong.urls.catbox = tempSong.urls.catbox || {};
+                    tempSong.urls.catbox["720"] = shortestLink.Url;
+                } else {
+                    tempSong.urls.catbox = tempSong.urls.catbox || {};
+                    tempSong.urls.catbox["0"] = shortestLink.Url;
+                }
+
+                // Set the video length from the shortest link
+                tempSong.videoLength = parseDuration(shortestLink.Duration);
             }
         }
 
@@ -163,7 +176,7 @@ function convertData() {
                         name: guessInfo.Username,
                         answer: guessInfo.Guess,
                         correct: guessInfo.IsGuessCorrect,
-                        score: 0, // EMQ doesn't provide score in this export
+                        score: 0,
                         position: 0,
                         positionSlot: 0,
                         active: true

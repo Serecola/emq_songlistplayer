@@ -218,17 +218,31 @@ function updateTypes() {
     	else if(uncheckedincorrect && wronganswer) {
     		$(elem).addClass("rowHidden");
     	}
-        else if ($(elem).text().includes("Opening") && $("#slTypeOpenings").hasClass("unchecked")) {
+        else if ($(elem).text().includes("OP") && $("#slTypeOpenings").hasClass("unchecked")) {
             $(elem).addClass("rowHidden");
         }
-        else if ($(elem).text().includes("Opening") && !$("#slTypeOpenings").hasClass("unchecked")) {
+        else if ($(elem).text().includes("OP") && !$("#slTypeOpenings").hasClass("unchecked")) {
             $(elem).removeClass("rowHidden");
             //playlist.push(index)
         }
-        else if ($(elem).text().includes("Ending") && $("#slTypeEndings").hasClass("unchecked")) {
+        else if ($(elem).text().includes("ED") && $("#slTypeEndings").hasClass("unchecked")) {
             $(elem).addClass("rowHidden");
         }
-        else if ($(elem).text().includes("Ending") && !$("#slTypeEndings").hasClass("unchecked")) {
+        else if ($(elem).text().includes("ED") && !$("#slTypeEndings").hasClass("unchecked")) {
+            $(elem).removeClass("rowHidden");
+            //playlist.push(index)
+        }
+        else if ($(elem).text().includes("BGM") && $("#slTypeBGM").hasClass("unchecked")) {
+            $(elem).addClass("rowHidden");
+        }
+        else if ($(elem).text().includes("BGM") && !$("#slTypeBGM").hasClass("unchecked")) {
+            $(elem).removeClass("rowHidden");
+            //playlist.push(index)
+        }
+                else if ($(elem).text().includes("Other") && $("#slTypeOther").hasClass("unchecked")) {
+            $(elem).addClass("rowHidden");
+        }
+        else if ($(elem).text().includes("Other") && !$("#slTypeOther").hasClass("unchecked")) {
             $(elem).removeClass("rowHidden");
             //playlist.push(index)
         }
