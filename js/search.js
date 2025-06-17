@@ -144,7 +144,7 @@ function searchArtist(query) {
     rebuildplaylist();
 }
 
-function searchAnime(query) {
+function searchVN(query) {
 	var except=false;
 	if(query.startsWith('-')) {
 		except=true;
@@ -154,12 +154,12 @@ function searchAnime(query) {
 	var uncheckedcorrect=$("#slPlayerCorrect").hasClass("unchecked");
 	var uncheckedincorrect=$("#slPlayerIncorrect").hasClass("unchecked");
 	resetplaylist();
-    $(".songData .animeNameRomaji").each((index, elem) => {
+    $(".songData .vnNameRomaji").each((index, elem) => {
     	var rightanswer=$(elem).parent().hasClass("rightAnswerTable");
     	var wronganswer=$(elem).parent().hasClass("wrongAnswerTable");
 
     	var matchromaji=testRegex($(elem).text(), query);
-    	var matchenglish=testRegex($(elem).parent().find(".animeNameEnglish").text(), query);
+    	var matchenglish=testRegex($(elem).parent().find(".vnNameEnglish").text(), query);
 
     	if(uncheckedcorrect && rightanswer) {
     		$(elem).addClass("rowHidden");
@@ -178,12 +178,12 @@ function searchAnime(query) {
         		else hide=true;
         	}
         	if(hide) {
-        		$(elem).parent().find(".animeNameEnglish").removeClass("rowHidden");
+        		$(elem).parent().find(".vnNameEnglish").removeClass("rowHidden");
         		$(elem).addClass("rowHidden");
         	}
         	else {
         		$(elem).removeClass("rowHidden");
-        		$(elem).parent().find(".animeNameEnglish").removeClass("rowHidden");
+        		$(elem).parent().find(".vnNameEnglish").removeClass("rowHidden");
         	}
         }
         updateRow($(elem).parent());

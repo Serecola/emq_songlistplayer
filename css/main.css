@@ -1,6 +1,6 @@
 body {
     font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    background-image: url("../img/amq-bg.jpg");
+    background-image: url("../img/emq-bg.webp");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: top;
@@ -58,7 +58,7 @@ body {
 }
 #slHeaderFilter {
     float: left;
-    width: 240px;
+    width: 300px;
     text-align: center;
     margin-top: 5px;
 }
@@ -70,7 +70,7 @@ body {
     visibility: hidden;
 }
 .slTypeFilter {
-    width: 33.33%;
+    width: 20%;
     text-align: center;
     float: left;
 }
@@ -89,14 +89,14 @@ body {
     top: -57%;
     user-select: none;
 }
-#slAnimeTitleSelectContainer {
+#slVNTitleSelectContainer {
     width: 100px;
     float: left;
     text-align: center;
     margin-top: 15px;
     margin-left: 2%;
 }
-#slAnimeTitleSelect {
+#slVNTitleSelect {
     color: black;
     width: 80px;
     margin-top: 5px;
@@ -405,17 +405,13 @@ tr.header > td {
     width: 18%;
     overflow-wrap: break-word; 
 }
-#slInfoAnimeEnglish {
-    width: 38%;
+#slInfoVNEnglish {
+    width: 100%;
     overflow-wrap: break-word;
 }
-#slInfoAnimeRomaji {
-    width: 38%;
+#slInfoVNRomaji {
+    width: 100%;
     overflow-wrap: break-word;
-}
-#slInfoSample {
-    width: 18%;
-    overflow-wrap: break-word; 
 }
 #slInfoUrls {
     width: 100%;

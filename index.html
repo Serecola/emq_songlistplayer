@@ -14,7 +14,7 @@
     <body onload="setup()">
         <div id="slHeader">
             <div id="slHeaderLeft">
-                <h1>AMQ Song List Player</h1>
+                <h1>EMQ Song List Player</h1>
                 <button id="slImportButton" class="btn btn-primary">Import</button>
                 <input id="slImport" type="file" name="slDataFile" accept="text/json" style="display: none;" />
             </div>
@@ -29,8 +29,8 @@
                         <input class="slSearchInput" id="slSearchArtist" placeholder="Search artist" type="text" />
                     </div>
                     <div class="slSearchContainer">
-                        <span>Anime:</span>
-                        <input class="slSearchInput" id="slSearchAnime" placeholder="Search anime" type="text" />
+                        <span>Visual Novel:</span>
+                        <input class="slSearchInput" id="slSearchVN" placeholder="Search visual novel" type="text" />
                     </div>
                     <div id="slHeaderFilter">
                         <span>Song Type</span>
@@ -51,13 +51,25 @@
                                 <div id="slTypeInserts" class="filterCheckbox">
                                     <label>&#10004;</label>
                                 </div>
-                                <span>Insert Songs</span>
+                                <span>Inserts</span>
+                            </div>
+                            <div class="slTypeFilter">
+                                <div id="slTypeOthers" class="filterCheckbox">
+                                    <label>&#10004;</label>
+                                </div>
+                                <span>Others</span>
+                            </div>
+                            <div class="slTypeFilter">
+                                <div id="slTypeBGM" class="filterCheckbox">
+                                    <label>&#10004;</label>
+                                </div>
+                                <span>BGM</span>
                             </div>
                         </div>
                     </div>
-                    <div id="slAnimeTitleSelectContainer">
-                        <span>Anime Titles</span>
-                        <select id="slAnimeTitleSelect">
+                    <div id="slVNTitleSelectContainer">
+                        <span>VN Titles</span>
+                        <select id="slVNTitleSelect">
                             <option value="english">English</option>
                             <option value="romaji" selected>Romaji</option>
                         </select>
@@ -101,7 +113,6 @@
                             <option value="start">Start</option>
                             <option value="mid">Mid</option>
                             <option value="end">End</option>
-                            <option value="recorded">Recorded</option>
                         </select>
                     </div>
                     <div id="slPlayOrderContainer">
@@ -113,14 +124,6 @@
                             <option value="20" selected>20</option>
                             <option value="30">30</option>
                             <option value="40">40</option>
-                        </select>
-                    </div>
-                    <div id="slPlayOrderContainer">
-                        <span>Host</span>
-                        <select id="slHost">
-                            <option value="nawdist.animemusicquiz.com">nawdist.animemusicquiz.com</option>
-                            <option value="naedist.animemusicquiz.com" selected>naedist.animemusicquiz.com</option>
-                            <option value="eudist.animemusicquiz.com">eudist.animemusicquiz.com</option>
                         </select>
                     </div>
                 </div>
@@ -167,12 +170,11 @@
                             <td class="songNumber">Number</td>
                             <td class="songName">Song Name</td>
                             <td class="songArtist">Artist</td>
-                            <td class="animeNameRomaji" style="display: none;">Anime</td>
-                            <td class="animeNameEnglish">Anime</td>
+                            <td class="vnNameRomaji" style="display: none;">Visual Novel</td>
+                            <td class="vnNameEnglish">Visual Novel</td>
                             <td class="songType">Type</td>
                             <td class="playerAnswer">Answer</td>
                             <td class="guessesCounter">Guesses</td>
-                            <td class="samplePoint">Sample</td>
                         </tr>
                     </table>
                 </div>
@@ -194,14 +196,13 @@
                         </div>
                     </div>
                     <div class="slInfoRow">
-                        <div id="slInfoAnimeEnglish">
-                            <h5>Anime English</h5>
+                        <div id="slInfoVNEnglish">
+                            <h5>VN English</h5>
                         </div>
-                        <div id="slInfoAnimeRomaji">
-                            <h5>Anime Romaji</h5>
-                        </div>
-                        <div id="slInfoSample">
-                            <h5>Sample Point</h5>
+                    </div>
+                    <div class="slInfoRow">
+                        <div id="slInfoVNRomaji">
+                            <h5>VN Romaji</h5>
                         </div>
                     </div>
                     <div class="slInfoRow">

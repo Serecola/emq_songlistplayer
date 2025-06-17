@@ -32,12 +32,12 @@ function loadData() {
                 .addClass("songArtist")
             )
             .append($("<td></td>")
-                .text(song.anime.romaji)
-                .addClass("animeNameRomaji")
+                .text(song.visualnovel.romaji)
+                .addClass("vnNameRomaji")
             )
             .append($("<td></td>")
-                .text(song.anime.english)
-                .addClass("animeNameEnglish")
+                .text(song.visualnovel.english)
+                .addClass("vnNameEnglish")
             )
             .append($("<td></td>")
                 .text(song.type)
@@ -50,10 +50,6 @@ function loadData() {
             .append($("<td></td>")
                 .text(guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount/song.activePlayers*100).toFixed(2)) + "%)")
                 .addClass("guessesCounter")
-            )
-            .append($("<td></td>")
-                .text(formatSamplePoint(song.startSample, song.videoLength))
-                .addClass("samplePoint")
             )
             .click(function () {
                 if (!$(this).hasClass("selected")) {
@@ -78,13 +74,13 @@ function loadData() {
             })
 
         );
-        if ($("#slAnimeTitleSelect").val() === "english") {
-            $(".animeNameEnglish").show();
-            $(".animeNameRomaji").hide();
+        if ($("#slVNTitleSelect").val() === "english") {
+            $(".vnNameEnglish").show();
+            $(".vnNameRomaji").hide();
         }
         else {
-            $(".animeNameEnglish").hide();
-            $(".animeNameRomaji").show();
+            $(".vnNameEnglish").hide();
+            $(".vnNameRomaji").show();
         }
         song.players.forEach((player) => {
             playerNames.add(player.name);
@@ -224,18 +220,15 @@ function updateInfo(song) {
 	    let infoArtist = $("<div></div>")
 	        .attr("id", "slInfoArtist")
 	        .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
-	    let infoAnimeEnglish = $("<div></div>")
-	        .attr("id", "slInfoAnimeEnglish")
-	        .html("<h5><b>Anime English</b></h5><p>" + song.anime.english + "</p>");
-	    let infoAnimeRomaji = $("<div></div>")
-	        .attr("id", "slInfoAnimeRomaji")
-	        .html("<h5><b>Anime Romaji</b></h5><p>" + song.anime.romaji + "</p>");
+	    let infoVNEnglish = $("<div></div>")
+	        .attr("id", "slInfoVNEnglish")
+	        .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
+	    let infoVNRomaji = $("<div></div>")
+	        .attr("id", "slInfoVNRomaji")
+	        .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
 	    let infoType = $("<div></div>")
 	        .attr("id", "slInfoType")
 	        .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
-	    let infoSample = $("<div></div>")
-	        .attr("id", "slInfoSample")
-	        .html("<h5><b>Sample Point</b></h5><p>" + formatSamplePoint(song.startSample, song.videoLength) + "</p>");
 	    let infoGuessed = $("<div></div>")
 	        .attr("id", "slInfoGuessed")
 	        .html("<h5><b>Guessed<br>" + guessesCount + "/" + song.activePlayers + " (" + parseFloat((guessesCount/song.activePlayers*100).toFixed(2)) + "%)</b></h5>");
@@ -250,9 +243,8 @@ function updateInfo(song) {
 	    infoRow1.append(infoArtist);
 	    infoRow1.append(infoType);
 
-	    infoRow2.append(infoAnimeEnglish);
-	    infoRow2.append(infoAnimeRomaji);
-	    infoRow2.append(infoSample);
+	    infoRow2.append(infoVNEnglish);
+	    infoRow2.append(infoVNRomaji);
 
 	    infoRow3.append(infoUrls);
 
