@@ -216,6 +216,8 @@ function openSongList(file) {
     let reader = new FileReader();
     reader.onload = function () {
         try {
+
+            $("#slPlayerName").val("");
             importData = JSON.parse(reader.result);
             convertData();
             $("#slInfo").hide();
