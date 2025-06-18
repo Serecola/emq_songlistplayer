@@ -218,6 +218,8 @@ function openSongList(file) {
         try {
 
             $("#slPlayerName").val("");
+            $('#slPlayerCorrect').removeClass('unchecked');
+            $('#slPlayerIncorrect').removeClass('unchecked');
             importData = JSON.parse(reader.result);
             convertData();
             $("#slInfo").hide();
