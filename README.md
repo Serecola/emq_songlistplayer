@@ -1,4 +1,4 @@
-# amq_songlistplayer
+# emq_songlistplayer
 
 based on https://github.com/nyamu-amq/amq_songlistplayer.
 
