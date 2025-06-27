@@ -148,7 +148,7 @@ function convertData() {
         // Process links - find all Self links and store them
         if (song.Links && song.Links.length) {
             // Store all Self links for display
-            tempSong.links = song.Links.filter(link => link.Type === "Self" && link.IsFileLink);
+            tempSong.links = song.Links.filter(link => link.Type === "Self");
             
             // Find shortest video and audio links for playback
             let videoLinks = tempSong.links.filter(link => link.IsVideo);
