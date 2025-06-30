@@ -24,16 +24,6 @@ function setup() {
         updateTypes();
         updateTableGuesses($("#slPlayerName").val());
     });
-    $("#slVNTitleSelect").on("change", function () { 
-        if ($(this).val() === "english") {
-            $(".vnNameEnglish").show();
-            $(".vnNameRomaji").hide();
-        }
-        else {
-            $(".vnNameEnglish").hide();
-            $(".vnNameRomaji").show();
-        }
-    });
     $("#slAutoPlay").on("change", updateAutoPlay);
     $("#slPlayerName").on("input", function () {
         updateScoreboardHighlight($(this).val());

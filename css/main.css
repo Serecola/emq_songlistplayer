@@ -89,18 +89,6 @@ body {
     top: -57%;
     user-select: none;
 }
-#slVNTitleSelectContainer {
-    width: 100px;
-    float: left;
-    text-align: center;
-    margin-top: 15px;
-    margin-left: 2%;
-}
-#slVNTitleSelect {
-    color: black;
-    width: 80px;
-    margin-top: 5px;
-}
 #slAutoPlayContainer {
     width: 80px;
     float: left;
@@ -466,8 +454,7 @@ tr.header > td {
         width: auto;
         margin: 0 10px;
     }
-    
-    #slVNTitleSelectContainer,
+
     #slAutoPlayContainer,
     #slPlayOrderContainer {
         width: auto;

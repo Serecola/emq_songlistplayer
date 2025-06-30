@@ -36,10 +36,6 @@ function loadData() {
                 .addClass("vnNameRomaji")
             )
             .append($("<td></td>")
-                .text(song.visualnovel.english)
-                .addClass("vnNameEnglish")
-            )
-            .append($("<td></td>")
                 .text(song.type)
                 .addClass("songType")
             )
@@ -74,14 +70,7 @@ function loadData() {
             })
 
         );
-        if ($("#slVNTitleSelect").val() === "english") {
-            $(".vnNameEnglish").show();
-            $(".vnNameRomaji").hide();
-        }
-        else {
-            $(".vnNameEnglish").hide();
-            $(".vnNameRomaji").show();
-        }
+        $(".vnNameRomaji").show();
         song.players.forEach((player) => {
             playerNames.add(player.name);
         });
