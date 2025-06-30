@@ -148,11 +148,11 @@ function convertData() {
         // Process links - find all Self links and store them
         if (song.Links && song.Links.length) {
             // Store all Self links for display
-            tempSong.links = song.Links.filter(link => link.Type === "Self" && link.IsFileLink);
+            tempSong.links = song.Links.filter(link => link.Type === "Self");
             
             // Find shortest video and audio links for playback
-            let videoLinks = tempSong.links.filter(link => link.IsVideo);
-            let audioLinks = tempSong.links.filter(link => !link.IsVideo);
+            let videoLinks = song.Links.filter(link => link.Type === "Self" && link.IsVideo);
+            let audioLinks = song.Links.filter(link => link.Type === "Self" && !link.IsVideo);
             
             if (videoLinks.length > 0) {
                 let shortestVideo = videoLinks.reduce((prev, current) => 
@@ -241,8 +241,6 @@ function openSongList(file) {
     }
     reader.readAsText(file);
 }
-
-// Remove the old convertJson and convertSong functions since we're handling conversion in convertData now
 
 function createVideoPlayer() {
     var videoPlayer = document.getElementById('videoPlayer');

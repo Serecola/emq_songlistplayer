@@ -434,3 +434,94 @@ tr.header > td {
     width: 48%;
     float: left;
 }
+
+/* Mobile responsiveness */
+@media screen and (max-width: 1200px) {
+    #slHeader {
+        height: auto;
+        min-height: 150px;
+    }
+    
+    #slHeaderLeft {
+        width: 100%;
+        float: none;
+        border-right: none;
+        border-bottom: 1px solid #6d6d6d;
+    }
+    
+    #slHeaderRight {
+        width: 100%;
+        float: none;
+    }
+    
+    #slHeaderSearch {
+        width: 100%;
+        padding: 10px;
+        border-right: none;
+        height: auto;
+    }
+    
+    .slSearchContainer {
+        width: 100%;
+        margin: 5px 0;
+    }
+    
+    #slHeaderFilter {
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    #slHeaderTypeFilters {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .slTypeFilter {
+        width: auto;
+        margin: 0 10px;
+    }
+    
+    #slVNTitleSelectContainer,
+    #slAutoPlayContainer,
+    #slPlayOrderContainer {
+        width: auto;
+        float: none;
+        display: inline-block;
+        margin: 10px;
+    }
+    
+    #slHeaderPlayer {
+        width: 100%;
+        float: none;
+        height: auto;
+        padding: 10px;
+        text-align: center;
+    }
+    
+    #slPlayerAnswerContainer,
+    #slPlayerCorrectContainer {
+        display: inline-block;
+        margin: 10px;
+        float: none;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    #slMain {
+        flex-direction: column;
+        height: auto;
+    }
+    
+    #slTableContainer,
+    #slScoreboard,
+    #slInfo {
+        width: 100%;
+        margin: 10px 0;
+        float: none;
+    }
+    
+    #slTableContainer {
+        min-width: unset;
+    }
+}

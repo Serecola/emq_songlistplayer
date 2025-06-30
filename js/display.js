@@ -319,7 +319,6 @@ function updateInfo(song) {
 		// Updated URL display section
 		infoListContainer = $("<ul></ul>").attr("id", "slInfoUrlList");
 
-		// Helper function to parse duration in seconds for comparison
 		function parseDuration(durationStr) {
 			if (!durationStr) return 0;
 			const parts = durationStr.split(':');
@@ -332,7 +331,6 @@ function updateInfo(song) {
 			return 0;
 		}
 
-		// Helper function to format duration as MM:SS
 		function formatDuration(durationStr) {
 			if (!durationStr) return "";
 			const parts = durationStr.split(':');
@@ -344,19 +342,16 @@ function updateInfo(song) {
 		}
 
 		if (song.links && song.links.length > 0) {
-			// Find shortest video link
 			const videoLinks = song.links.filter(link => link.IsVideo);
 			const shortestVideo = videoLinks.reduce((shortest, current) => {
 				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
 			}, videoLinks[0]);
 
-			// Find shortest audio link
 			const audioLinks = song.links.filter(link => !link.IsVideo);
 			const shortestAudio = audioLinks.reduce((shortest, current) => {
 				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
 			}, audioLinks[0]);
 
-			// Display shortest video link if exists
 			if (shortestVideo) {
 				infoListContainer.append(
 					$("<li></li>").append(
@@ -370,7 +365,6 @@ function updateInfo(song) {
 				);
 			}
 
-			// Display shortest audio link if exists
 			if (shortestAudio) {
 				infoListContainer.append(
 					$("<li></li>").append(
@@ -433,7 +427,6 @@ function updateInfo(song) {
 			
 			play(shortestAudio.Url, starttime);
 		} else {
-			// Fallback to video if no audio available
 			for (let res of reslist) {
 				for (let host of hostlist) {
 					if (song.urls[host] !== undefined) {
@@ -470,24 +463,20 @@ function formatUrl(src) {
 let currentAudio = null;
 
 function play(url, starttime) {
-    // Stop any currently playing audio first
     if (currentAudio) {
         currentAudio.pause();
         currentAudio = null;
     }
     
-    // Create new audio element
     currentAudio = document.getElementById('videoPlayer');
     currentAudio.src = url;
     currentAudio.currentTime = starttime;
     
-    // Handle potential play errors
     const playPromise = currentAudio.play();
     
     if (playPromise !== undefined) {
         playPromise.catch(error => {
             console.error("Playback failed:", error);
-            // Try falling back to video if audio fails
             if (url.includes('.mp3') || url.includes('.weba')) {
                 const videoLinks = song.links.filter(link => link.IsVideo);
                 if (videoLinks.length > 0) {

@@ -10,6 +10,7 @@
         <script src="js/search.js"></script>
         <link rel="stylesheet" type="text/css" href="css/main.css" />
         <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body onload="setup()">
         <div id="slHeader">
@@ -17,6 +18,11 @@
                 <h1>EMQ Song List Player</h1>
                 <button id="slImportButton" class="btn btn-primary">Import</button>
                 <input id="slImport" type="file" name="slDataFile" accept="text/json" style="display: none;" />
+            </div>
+            <div id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
             <div id="slHeaderRight">
                 <div id="slHeaderSearch">
