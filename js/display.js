@@ -138,46 +138,73 @@ function updateTableGuesses(playerName) {
     }
 }
 
-function updateScoreboard(song) {
-    $(".slScoreboardEntry").remove();
-    song.players.sort((a, b) => a.positionSlot - b.positionSlot).forEach((player) => {
-        $("#slScoreboardContainer").append($("<div></div>")
-            .addClass("slScoreboardEntry")
-            .addClass(player.active === false ? "disabled" : "")
-            .append($("<span></span>")
-                .addClass("slScoreboardPosition")
-                .text(player.position)
-                .width(player.position.toString().length === 3 ? "42px" : "")
-                .css("text-align", player.position.toString().length === 3 ? "left" : "center")
-            )
-            .append($("<p></p>")
-                .append($("<b></b>")
-                    .addClass("slScoreboardScore")
-                    .addClass(player.correct === true ? "rightAnswerScoreboard" : "")
-                    .text(player.score)
-                )
-                .append($("<span></span>")
-                    .addClass("slScoreboardCorrectGuesses")
-                    .addClass((song.gameMode !== "Standard" && song.gameMode !== "Ranked") ? "" : "hide")
-                    .text(player.correctGuesses)
-                )
-                .append($("<span></span>")
-                    .addClass("slScoreboardName")
-                    .text(player.name)
-                    .addClass($("#slPlayerName").val() === player.name ? "self" : "")
-                )
-            )
-        )
+function updateScoreboard(selectedSong) {
+    if (!importData || !selectedSong) return;
+    
+    let container = document.getElementById('slScoreboardContainer');
+    container.innerHTML = '';
+    
+    // Calculate progressive scores up to the selected song
+    let progressiveScores = {};
+    let selectedSongIndex = selectedSong.songid;
+    
+    // Go through all songs up to and including the selected song
+    for (let i = 0; i <= selectedSongIndex; i++) {
+        let song = importData[i];
+        if (!song) continue;
+        
+        song.players.forEach(player => {
+            if (!progressiveScores[player.name]) {
+                progressiveScores[player.name] = {
+                    correct: 0,
+                    total: 0
+                };
+            }
+            progressiveScores[player.name].total++;
+            if (player.correct) {
+                progressiveScores[player.name].correct++;
+            }
+        });
+    }
+    
+    // Convert to array and sort by correct answers
+    let scores = Object.entries(progressiveScores)
+        .map(([name, stats]) => ({
+            name,
+            correct: stats.correct,
+            total: stats.total,
+        }))
+        .sort((a, b) => b.correct - a.correct);
+    
+    // Create scoreboard entries
+    scores.forEach((player, index) => {
+        let entry = document.createElement('div');
+        entry.className = 'slScoreboardEntry';
+        
+        let position = document.createElement('span');
+        position.className = 'slScoreboardPosition';
+        position.textContent = `${index + 1}.`;
+        
+        let score = document.createElement('p');
+        score.className = 'slScoreboardScore';
+        score.textContent = `${player.correct}`;
+        
+        let name = document.createElement('p');
+        name.className = 'slScoreboardName';
+        name.textContent = player.name;
+        
+        entry.appendChild(position);
+        entry.appendChild(score);
+        entry.appendChild(name);
+        container.appendChild(entry);
     });
 }
 
-function updateScoreboardHighlight(name) {
-    $(".slScoreboardEntry").each((index, elem) => {
-        if ($(elem).find(".slScoreboardName").text() === name) {
-            $(elem).find(".slScoreboardName").addClass("self");
-        }
-        else {
-            $(elem).find(".slScoreboardName").removeClass("self");
+function updateScoreboardHighlight(playerName) {
+    document.querySelectorAll('.slScoreboardEntry').forEach(entry => {
+        entry.classList.remove('highlight');
+        if (entry.querySelector('.slScoreboardName').textContent === playerName) {
+            entry.classList.add('highlight');
         }
     });
 }
@@ -399,7 +426,8 @@ function updateInfo(song) {
 
     var length = parseInt($("#slLength").val());
 
-    if (autoplay) {
+    const autoplayEnabled = $("#slAutoPlay").val() === "on";
+    if (autoplayEnabled) {
     // Find all audio links
     const audioLinks = song.links.filter(link => !link.IsVideo);
 		

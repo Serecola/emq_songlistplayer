@@ -34,15 +34,7 @@ function setup() {
             $(".vnNameRomaji").show();
         }
     });
-    $(".autoplayCheckbox").click(function () {
-        if ($(this).hasClass("unchecked")) {
-            $(this).removeClass("unchecked");
-        }
-        else {
-            $(this).addClass("unchecked");
-        }
-        updateAutoPlay();
-    });
+    $("#slAutoPlay").on("change", updateAutoPlay);
     $("#slPlayerName").on("input", function () {
         updateScoreboardHighlight($(this).val());
         updateTableGuesses($(this).val());
@@ -96,7 +88,8 @@ function convertData() {
     let tempData = [];
     let songNumber = 1;
     let songsArray = Object.values(importData);
-    
+    let playerScores = {};
+
     for (let songData of songsArray) {
         if (!songData.Song) continue;
         
@@ -174,20 +167,33 @@ function convertData() {
             }
         }
 
-        // Process player guesses
         if (songData.PlayerGuessInfos) {
             for (let playerId in songData.PlayerGuessInfos) {
                 let guessInfo = songData.PlayerGuessInfos[playerId].Mst;
+                let username = guessInfo.Username;
+                
+                if (!playerScores[username]) {
+                    playerScores[username] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+                
+                playerScores[username].total++;
+                if (guessInfo.IsGuessCorrect) {
+                    playerScores[username].correct++;
+                }
+                
                 tempSong.players.push({
-                    name: guessInfo.Username,
-                    answer: guessInfo.Guess || "", // Empty string if no guess
+                    name: username,
+                    answer: guessInfo.Guess || "",
                     correct: guessInfo.IsGuessCorrect || false,
                     score: 0,
                     position: 0,
                     positionSlot: 0,
                     active: true
                 });
-                playerNames.add(guessInfo.Username);
+                playerNames.add(username);
             }
         }
 
@@ -195,6 +201,7 @@ function convertData() {
     }
     
     importData = tempData;
+    importData.playerScores = playerScores;
 }
 
 function parseDuration(durationStr) {
@@ -222,6 +229,7 @@ function openSongList(file) {
             $('#slPlayerIncorrect').removeClass('unchecked');
             importData = JSON.parse(reader.result);
             convertData();
+            updateScoreboard();
             $("#slInfo").hide();
             $("#slScoreboard").hide();
             loadData();
