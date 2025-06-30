@@ -315,20 +315,10 @@ function updateInfo(song) {
             }
             infoGuessed.append(infoListContainer);
         }
-        let listStatus = {
-            1: "Watching",
-            2: "Completed",
-            3: "On-Hold",
-            4: "Dropped",
-            5: "Plan to Watch",
-            6: "Looted"
-        };
 
         infoListContainer = $("<ul></ul>");
-        for (let fromList of song.fromList) {
-            infoListContainer.append($("<li></li>")
-                .text(fromList.name + " (" + listStatus[fromList.listStatus] + ((fromList.score !== null) ? ", " + fromList.score + ")" : ")"))
-            );
+        for (let playerName of song.fromList) {
+            infoListContainer.append($("<li></li>").text(playerName));
         }
         infoFromList.append(infoListContainer);
 

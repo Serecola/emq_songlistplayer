@@ -114,26 +114,23 @@ function convertData() {
             },
             songNumber: songNumber++,
             type: songType,
-            urls: {}, // Will store both video and audio links
+            urls: {},
             activePlayers: songData.PlayerGuessInfos 
                 ? Object.keys(songData.PlayerGuessInfos).length 
                 : 0,
             totalPlayers: songData.PlayerGuessInfos ? Object.keys(songData.PlayerGuessInfos).length : 0,
             players: [],
-            fromList: [],
+            fromList: [], // Now will just store names
             correctCount: songData.TimesCorrect || 0,
             videoLength: 0,
             startSample: 0,
-            // Store all Self links for display
             links: []
         };
 
-        // Process links - find all Self links and store them
+        // Process links
         if (song.Links && song.Links.length) {
-            // Store all Self links for display
             tempSong.links = song.Links.filter(link => link.Type === "Self");
             
-            // Find shortest video and audio links for playback
             let videoLinks = song.Links.filter(link => link.Type === "Self" && link.IsVideo);
             let audioLinks = song.Links.filter(link => link.Type === "Self" && !link.IsVideo);
             
@@ -150,7 +147,6 @@ function convertData() {
                     parseDuration(prev.Duration) < parseDuration(current.Duration) ? prev : current
                 );
                 tempSong.urls.audio = shortestAudio.Url;
-                // Only set videoLength from video if available, otherwise use audio
                 if (!tempSong.videoLength) {
                     tempSong.videoLength = parseDuration(shortestAudio.Duration);
                 }
@@ -183,6 +179,12 @@ function convertData() {
                     positionSlot: 0,
                     active: true
                 });
+
+                // Simplified - just store the name if IsOnList is true
+                if (guessInfo.IsOnList) {
+                    tempSong.fromList.push(username);
+                }
+
                 playerNames.add(username);
             }
         }
