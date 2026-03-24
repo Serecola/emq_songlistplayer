@@ -74,7 +74,21 @@ function uploadFiles(e){
 
 function convertData() {
     if (!importData || typeof importData !== 'object') return;
-    
+
+    // Handle new EMQ Room export format: { Room: {...}, Quizzes: [{Quiz, SongHistories, PlayerStats}] }
+    if (importData.Quizzes && Array.isArray(importData.Quizzes)) {
+        let allSongHistories = {};
+        let songIndex = 0;
+        for (let quiz of importData.Quizzes) {
+            if (quiz.SongHistories) {
+                for (let key of Object.keys(quiz.SongHistories)) {
+                    allSongHistories[songIndex++] = quiz.SongHistories[key];
+                }
+            }
+        }
+        importData = allSongHistories;
+    }
+
     let tempData = [];
     let songNumber = 1;
     let songsArray = Object.values(importData);
