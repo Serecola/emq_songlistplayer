@@ -12,7 +12,25 @@ function loadData() {
     clearScoreboard();
     $("tr.songData").remove();
     let songid = 0;
+    let lastQuizIndex = -1;
+    let quizCounter = 0;
     for (let song of importData) {
+        // Insert a separator row when the quiz changes
+        let songQuizIndex = song.quizIndex !== undefined ? song.quizIndex : 0;
+        if (songQuizIndex !== lastQuizIndex) {
+            lastQuizIndex = songQuizIndex;
+            quizCounter++;
+            let boundary = importData.quizBoundaries && importData.quizBoundaries.find(b => b.quizIndex === songQuizIndex);
+            let dateStr = boundary && boundary.createdAt
+                ? new Date(boundary.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                : ('Quiz ' + quizCounter);
+            $("#slTable").append(
+                $("<tr></tr>").addClass("quizSeparator").append(
+                    $("<td></td>").attr("colspan", "7").text("— Quiz " + quizCounter + "  ·  " + dateStr + " —")
+                )
+            );
+        }
+
         let guesses = song.players.filter((tmpPlayer) => tmpPlayer.correct === true);
         let guessesCount = guesses.length;
         if (song.correctCount) guessesCount = song.correctCount;
@@ -129,59 +147,51 @@ function updateTableGuesses(playerName) {
 
 function updateScoreboard(selectedSong) {
     if (!importData || !selectedSong) return;
-    
+
     let container = document.getElementById('slScoreboardContainer');
     container.innerHTML = '';
-    
-    // Calculate progressive scores up to the selected song
+
     let progressiveScores = {};
     let selectedSongIndex = selectedSong.songid;
-    
-    // Go through all songs up to and including the selected song
+    let targetQuiz = selectedSong.quizIndex !== undefined ? selectedSong.quizIndex : 0;
+
     for (let i = 0; i <= selectedSongIndex; i++) {
         let song = importData[i];
         if (!song) continue;
-        
+        // Only count songs from the same quiz
+        if ((song.quizIndex !== undefined ? song.quizIndex : 0) !== targetQuiz) continue;
+
         song.players.forEach(player => {
             if (!progressiveScores[player.name]) {
-                progressiveScores[player.name] = {
-                    correct: 0,
-                    total: 0
-                };
+                progressiveScores[player.name] = { correct: 0, total: 0 };
             }
-            progressiveScores[player.name].total++;
-            if (player.correct) {
-                progressiveScores[player.name].correct++;
-            }
+            let correct = (player.categoryCorrect !== undefined) ? player.categoryCorrect : (player.correct ? 1 : 0);
+            let total = (player.categoryTotal !== undefined) ? player.categoryTotal : 1;
+            progressiveScores[player.name].correct += correct;
+            progressiveScores[player.name].total += total;
         });
     }
-    
-    // Convert to array and sort by correct answers
+
     let scores = Object.entries(progressiveScores)
-        .map(([name, stats]) => ({
-            name,
-            correct: stats.correct,
-            total: stats.total,
-        }))
+        .map(([name, stats]) => ({ name, correct: stats.correct, total: stats.total }))
         .sort((a, b) => b.correct - a.correct);
-    
-    // Create scoreboard entries
+
     scores.forEach((player, index) => {
         let entry = document.createElement('div');
         entry.className = 'slScoreboardEntry';
-        
+
         let position = document.createElement('span');
         position.className = 'slScoreboardPosition';
         position.textContent = `${index + 1}.`;
-        
-        let score = document.createElement('p');
+
+        let score = document.createElement('span');
         score.className = 'slScoreboardScore';
         score.textContent = `${player.correct}`;
-        
-        let name = document.createElement('p');
+
+        let name = document.createElement('span');
         name.className = 'slScoreboardName';
         name.textContent = player.name;
-        
+
         entry.appendChild(position);
         entry.appendChild(score);
         entry.appendChild(name);
@@ -229,6 +239,25 @@ function updateInfo(song) {
 		let guessedPercentage = totalPlayers > 0 ? parseFloat((correctGuesses / totalPlayers * 100).toFixed(2)) : 0;
 
 		let guesses = song.players.filter(player => player.correct === true);
+
+		// Build running totals up to this song for "Name total (+perSong)" display
+		// Scoped to the same quiz so scores reset per quiz
+		let runningTotals = {};
+		let songQuizIndex = song.quizIndex !== undefined ? song.quizIndex : 0;
+		for (let i = 0; i <= song.songid; i++) {
+			let s = importData[i];
+			if (!s) continue;
+			if ((s.quizIndex !== undefined ? s.quizIndex : 0) !== songQuizIndex) continue;
+			s.players.forEach(p => {
+				if (!runningTotals[p.name]) runningTotals[p.name] = 0;
+				runningTotals[p.name] += (p.categoryCorrect !== undefined ? p.categoryCorrect : (p.correct ? 1 : 0));
+			});
+		}
+		function formatGuessedEntry(player) {
+			let total = runningTotals[player.name] || 0;
+			let perSong = player.categoryCorrect !== undefined ? player.categoryCorrect : (player.correct ? 1 : 0);
+			return player.name + " " + total + " (+" + perSong + ")";
+		}
 
         let infoSongName = $("<div></div>")
             .attr("id", "slInfoSongName")
@@ -280,12 +309,12 @@ function updateInfo(song) {
 				for (let guessed of guesses) {
 					if (i++ % 2 === 0) {
 						infoGuessedLeft.append($("<li></li>")
-							.text(guessed.name + " (" + guessed.score + ")")
+							.text(formatGuessedEntry(guessed))
 						);
 					}
 					else {
 						infoGuessedRight.append($("<li></li>")
-							.text(guessed.name + " (" + guessed.score + ")")
+							.text(formatGuessedEntry(guessed))
 						);
 					}
 				}
@@ -297,7 +326,7 @@ function updateInfo(song) {
 					.attr("id", "slInfoGuessedList");
 				for (let guessed of guesses) {
 					infoListContainer.append($("<li></li>")
-						.text(guessed.name + " (" + guessed.score + ")")
+						.text(formatGuessedEntry(guessed))
 					);
 				}
 				infoGuessed.append(infoListContainer);
@@ -310,7 +339,7 @@ function updateInfo(song) {
             infoFromList.show();
             for (let guessed of guesses) {
                 infoListContainer.append($("<li></li>")
-                    .text(guessed.name + " (" + guessed.score + ")")
+                    .text(formatGuessedEntry(guessed))
                 );
             }
             infoGuessed.append(infoListContainer);

@@ -76,25 +76,43 @@ function convertData() {
     if (!importData || typeof importData !== 'object') return;
 
     // Handle new EMQ Room export format: { Room: {...}, Quizzes: [{Quiz, SongHistories, PlayerStats}] }
+    // Each quiz is stored as a flat list of songs tagged with quizIndex so scores reset per quiz.
+    let quizBoundaries = []; // [{start, end, createdAt}] indices into tempData
+    let allSongEntries = []; // [{songData, quizIndex}]
+
     if (importData.Quizzes && Array.isArray(importData.Quizzes)) {
-        let allSongHistories = {};
-        let songIndex = 0;
-        for (let quiz of importData.Quizzes) {
+        // Sort quizzes oldest-first so song numbering goes chronologically
+        let quizzes = [...importData.Quizzes].sort((a, b) =>
+            new Date(a.Quiz.created_at) - new Date(b.Quiz.created_at)
+        );
+        for (let qi = 0; qi < quizzes.length; qi++) {
+            let quiz = quizzes[qi];
             if (quiz.SongHistories) {
                 for (let key of Object.keys(quiz.SongHistories)) {
-                    allSongHistories[songIndex++] = quiz.SongHistories[key];
+                    allSongEntries.push({ songData: quiz.SongHistories[key], quizIndex: qi, createdAt: quiz.Quiz.created_at });
                 }
             }
         }
-        importData = allSongHistories;
+    } else {
+        // Legacy flat format
+        for (let songData of Object.values(importData)) {
+            allSongEntries.push({ songData, quizIndex: 0, createdAt: null });
+        }
     }
 
     let tempData = [];
-    let songNumber = 1;
-    let songsArray = Object.values(importData);
     let playerScores = {};
+    let currentQuizIndex = -1;
+    let songNumber = 1;
 
-    for (let songData of songsArray) {
+    for (let { songData, quizIndex, createdAt } of allSongEntries) {
+        // Reset song counter when a new quiz starts
+        if (quizIndex !== currentQuizIndex) {
+            currentQuizIndex = quizIndex;
+            songNumber = 1;
+            // Mark the boundary for this quiz in tempData
+            quizBoundaries.push({ quizIndex, start: tempData.length, createdAt });
+        }
         if (!songData.Song) continue;
         
         let song = songData.Song;
@@ -116,6 +134,7 @@ function convertData() {
         let romajiTitle = song.Sources[0].Titles.find(t => t.Language === "ja")?.LatinTitle || song.Sources[0].Titles[0].LatinTitle;
         
         let tempSong = {
+            quizIndex: quizIndex,
             gameMode: "Standard",
             name: song.Titles[0].LatinTitle,
             artist: song.Artists
@@ -129,13 +148,11 @@ function convertData() {
             songNumber: songNumber++,
             type: songType,
             urls: {},
-            activePlayers: songData.PlayerGuessInfos 
-                ? Object.keys(songData.PlayerGuessInfos).length 
-                : 0,
+            activePlayers: 0,   // filled after processing PlayerGuessInfos
             totalPlayers: songData.PlayerGuessInfos ? Object.keys(songData.PlayerGuessInfos).length : 0,
             players: [],
             fromList: [], // Now will just store names
-            correctCount: songData.TimesCorrect || 0,
+            correctCount: 0,    // filled after processing PlayerGuessInfos
             videoLength: 0,
             startSample: 0,
             links: []
@@ -169,33 +186,43 @@ function convertData() {
 
         if (songData.PlayerGuessInfos) {
             for (let playerId in songData.PlayerGuessInfos) {
-                let guessInfo = songData.PlayerGuessInfos[playerId].Mst;
-                let username = guessInfo.Username;
-                
-                if (!playerScores[username]) {
-                    playerScores[username] = {
-                        correct: 0,
-                        total: 0
-                    };
+                let playerGuesses = songData.PlayerGuessInfos[playerId];
+
+                // Use Mst for display name/answer; fall back to first available category
+                let primaryGuess = playerGuesses.Mst || Object.values(playerGuesses)[0];
+                if (!primaryGuess) continue;
+                let username = primaryGuess.Username;
+
+                // Count correct across all guess categories (each category counts as 1)
+                let categories = Object.values(playerGuesses);
+                let categoryCorrect = categories.filter(g => g.IsGuessCorrect).length;
+                let categoryTotal = categories.length;
+
+                let scoreKey = quizIndex + ':' + username;
+                if (!playerScores[scoreKey]) {
+                    playerScores[scoreKey] = { correct: 0, total: 0, name: username, quizIndex };
                 }
-                
-                playerScores[username].total++;
-                if (guessInfo.IsGuessCorrect) {
-                    playerScores[username].correct++;
-                }
-                
+                playerScores[scoreKey].correct += categoryCorrect;
+                playerScores[scoreKey].total += categoryTotal;
+
+                // Build answer string showing all category guesses
+                let answerParts = Object.entries(playerGuesses)
+                    .map(([type, g]) => `[${type}] ${g.Guess || ""}`)
+                    .join(", ");
+
                 tempSong.players.push({
                     name: username,
-                    answer: guessInfo.Guess || "",
-                    correct: guessInfo.IsGuessCorrect || false,
-                    score: 0,
+                    answer: answerParts,
+                    correct: categoryCorrect > 0,
+                    categoryCorrect: categoryCorrect,
+                    categoryTotal: categoryTotal,
+                    score: categoryCorrect,
                     position: 0,
                     positionSlot: 0,
                     active: true
                 });
 
-                // Simplified - just store the name if IsOnList is true
-                if (guessInfo.IsOnList) {
+                if (primaryGuess.IsOnList) {
                     tempSong.fromList.push(username);
                 }
 
@@ -203,11 +230,21 @@ function convertData() {
             }
         }
 
+        // Set real totals from processed player data
+        tempSong.correctCount = tempSong.players.reduce((sum, p) => sum + (p.categoryCorrect !== undefined ? p.categoryCorrect : (p.correct ? 1 : 0)), 0);
+        tempSong.activePlayers = tempSong.players.reduce((sum, p) => sum + (p.categoryTotal !== undefined ? p.categoryTotal : 1), 0);
+
         tempData.push(tempSong);
     }
-    
+
+    // Close the last quiz boundary
+    if (quizBoundaries.length > 0) {
+        quizBoundaries[quizBoundaries.length - 1].end = tempData.length - 1;
+    }
+
     importData = tempData;
     importData.playerScores = playerScores;
+    importData.quizBoundaries = quizBoundaries;
 }
 
 function parseDuration(durationStr) {
@@ -233,6 +270,7 @@ function openSongList(file) {
             $("#slPlayerName").val("");
             $('#slPlayerCorrect').removeClass('unchecked');
             $('#slPlayerIncorrect').removeClass('unchecked');
+            playerNames.clear();
             importData = JSON.parse(reader.result);
             convertData();
             updateScoreboard();
