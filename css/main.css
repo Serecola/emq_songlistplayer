@@ -285,7 +285,8 @@ tr.header > td {
     margin: 10px;
 }
 #slScoreboardContainer {
-    margin-left: 10px;
+    margin-left: 0;
+    padding: 0 10px;
     max-height: calc(100vh - 241px);
     overflow-y: auto;
     padding-bottom: 5px;
@@ -522,4 +523,6 @@ tr.header > td {
     #slTableContainer {
         min-width: unset;
     }
+
+    
 }
