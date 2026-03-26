@@ -147,28 +147,39 @@ function updateTableGuesses(playerName) {
         let findPlayer = importData[i].players.find((player) => {
             return player.name === playerName;
         });
+        let $row = $($("tr.songData").get(i));
+        let $answerCell = $($(".songData .playerAnswer").get(i));
         if (findPlayer !== undefined) {
             playerExists = true;
-            $($(".songData .playerAnswer").get(i)).text(getAnswerForType(findPlayer, guessType));
+            $answerCell.text(getAnswerForType(findPlayer, guessType));
+            $answerCell.removeClass("rowHidden");
             $(".playerAnswer").show();
 
             if (findPlayer.active === true) {
                 let isCorrect = isCorrectForType(findPlayer, guessType);
-                $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
-                $($("tr.songData").get(i)).addClass(isCorrect ? "rightAnswerTable" : "wrongAnswerTable");
+                $row.removeClass("rightAnswerTable wrongAnswerTable");
+                $row.addClass(isCorrect ? "rightAnswerTable" : "wrongAnswerTable");
             }
             else {
-                $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
+                $row.removeClass("rightAnswerTable wrongAnswerTable");
             }
         }
         else {
-            $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
-            $($(".songData .playerAnswer").get(i)).text("...");
+            $row.removeClass("rightAnswerTable wrongAnswerTable");
+            $answerCell.text("...");
             if (!playerExists) {
                 $(".playerAnswer").hide();
             }
+            // If a player is selected but didn't participate in this song, hide the row
+            if (playerName && playerName.trim() !== "") {
+                $answerCell.addClass("rowHidden");
+            } else {
+                $answerCell.removeClass("rowHidden");
+            }
         }
+        updateRow($row);
     }
+    rebuildplaylist();
 }
 
 // Friendly display names for known guess type codes
