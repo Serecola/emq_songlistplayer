@@ -89,8 +89,7 @@ body {
     top: -57%;
     user-select: none;
 }
-#slAutoPlayContainer {
-    width: 80px;
+.slDropdownContainer {
     float: left;
     text-align: center;
     margin-top: 15px;
@@ -99,39 +98,37 @@ body {
 #slAutoPlay {
     color: black;
     width: 80px;
-    margin-top: 5px;
-}
-#slPlayOrderContainer {
-    width: 80px;
-    float: left;
-    text-align: center;
     margin-top: 15px;
-    margin-left: 2%;
 }
 #slRepeat {
     color: black;
     width: 80px;
-    margin-top: 5px;
+    margin-top: 15px;
 }
 #slPlayOrder {
     color: black;
-    width: 80px;
-    margin-top: 5px;
+    width: 100px;
+    margin-top: 15px;
 }
 #slSample {
     color: black;
     width: 80px;
-    margin-top: 5px;
+    margin-top: 15px;
 }
 #slLength {
     color: black;
     width: 80px;
-    margin-top: 5px;
+    margin-top: 15px;
+}
+#slGuessType {
+    color: black;
+    width: 105px;
+    margin-top: 15px;
 }
 #slHost {
     color: black;
     width: 160px;
-    margin-top: 5px;
+    margin-top: 15px;
 }
 
 #slHeaderPlayer {
@@ -482,8 +479,7 @@ tr.header > td {
         margin: 0 10px;
     }
 
-    #slAutoPlayContainer,
-    #slPlayOrderContainer {
+    .slDropdownContainer {
         width: auto;
         float: none;
         display: inline-block;
@@ -523,6 +519,4 @@ tr.header > td {
     #slTableContainer {
         min-width: unset;
     }
-
-    
 }

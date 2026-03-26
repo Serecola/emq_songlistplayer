@@ -25,6 +25,10 @@ function setup() {
         updateTableGuesses($("#slPlayerName").val());
     });
     $("#slAutoPlay").on("change", updateAutoPlay);
+    $("#slGuessType").on("change", function() {
+        updateTableGuesses($("#slPlayerName").val());
+        updateTypes();
+    });
     $("#slPlayerName").on("input", function () {
         updateScoreboardHighlight($(this).val());
         updateTableGuesses($(this).val());
@@ -205,14 +209,19 @@ function convertData() {
                 playerScores[scoreKey].correct += categoryCorrect;
                 playerScores[scoreKey].total += categoryTotal;
 
-                // Build answer string showing all category guesses
-                let answerParts = Object.entries(playerGuesses)
-                    .map(([type, g]) => `[${type}] ${g.Guess || ""}`)
-                    .join(", ");
+                // Store guesses per category for dynamic display
+                let guessesMap = {};
+                for (let [type, g] of Object.entries(playerGuesses)) {
+                    guessesMap[type] = { guess: g.Guess || "", correct: g.IsGuessCorrect };
+                }
+
+                // Track available guess types for this quiz
+                if (!tempSong._quizGuessTypes) tempSong._quizGuessTypes = new Set();
+                for (let type of Object.keys(playerGuesses)) tempSong._quizGuessTypes.add(type);
 
                 tempSong.players.push({
                     name: username,
-                    answer: answerParts,
+                    answer: guessesMap,
                     correct: categoryCorrect > 0,
                     categoryCorrect: categoryCorrect,
                     categoryTotal: categoryTotal,
@@ -234,12 +243,30 @@ function convertData() {
         tempSong.correctCount = tempSong.players.reduce((sum, p) => sum + (p.categoryCorrect !== undefined ? p.categoryCorrect : (p.correct ? 1 : 0)), 0);
         tempSong.activePlayers = tempSong.players.reduce((sum, p) => sum + (p.categoryTotal !== undefined ? p.categoryTotal : 1), 0);
 
+        // Collect guess types into the current quiz boundary
+        if (tempSong._quizGuessTypes && quizBoundaries.length > 0) {
+            let curBoundary = quizBoundaries[quizBoundaries.length - 1];
+            if (!curBoundary.guessTypes) curBoundary.guessTypes = new Set();
+            for (let t of tempSong._quizGuessTypes) curBoundary.guessTypes.add(t);
+        }
+        delete tempSong._quizGuessTypes;
+
         tempData.push(tempSong);
     }
 
-    // Close the last quiz boundary
-    if (quizBoundaries.length > 0) {
-        quizBoundaries[quizBoundaries.length - 1].end = tempData.length - 1;
+    // Close the last quiz boundary; convert Sets to sorted Arrays
+    const TYPE_ORDER = ['Mst', 'A', 'Mt', 'Composer', 'Developer'];
+    for (let b of quizBoundaries) {
+        b.end = tempData.length - 1;
+        if (b.guessTypes) {
+            b.guessTypes = [...b.guessTypes].sort((a, z) => {
+                let ai = TYPE_ORDER.indexOf(a), zi = TYPE_ORDER.indexOf(z);
+                if (ai === -1) ai = 99; if (zi === -1) zi = 99;
+                return ai - zi;
+            });
+        } else {
+            b.guessTypes = [];
+        }
     }
 
     importData = tempData;

@@ -69,6 +69,9 @@ function loadData() {
                 if (!$(this).hasClass("selected")) {
                     $(".selected").removeClass("selected");
                     $(this).addClass("selected");
+                    // Update guess type dropdown if this song belongs to a different quiz
+                    updateGuessTypeDropdown(song.quizIndex !== undefined ? song.quizIndex : 0);
+                    updateTableGuesses($("#slPlayerName").val());
                     updateScoreboard(song);
                     updateInfo(song);
                     repeat = repeatcount = $("#slRepeat").val() * 1;
@@ -101,6 +104,10 @@ function loadData() {
         );
     });
     $(".playerAnswer").hide();
+    // Initialize guess type dropdown for the first quiz
+    if (importData.quizBoundaries && importData.quizBoundaries.length > 0) {
+        updateGuessTypeDropdown(importData.quizBoundaries[0].quizIndex);
+    }
     updateTableGuesses($("#slPlayerName").val());
     updateScoreboardHighlight($("#slPlayerName").val());
 }
@@ -115,7 +122,26 @@ function formatSamplePoint(start, length) {
     return startPoint + "/" + totalLength;
 }
 
+function getAnswerForType(player, guessType) {
+    if (!player.answer || typeof player.answer !== 'object') return player.answer || "...";
+    if (!guessType) {
+        return Object.entries(player.answer)
+            .map(([type, g]) => `[${type}] ${g.guess}`)
+            .join(", ");
+    }
+    let entry = player.answer[guessType];
+    return entry ? entry.guess : "—";
+}
+
+function isCorrectForType(player, guessType) {
+    if (!player.answer || typeof player.answer !== 'object') return player.correct;
+    if (!guessType) return player.correct;
+    let entry = player.answer[guessType];
+    return entry ? entry.correct : false;
+}
+
 function updateTableGuesses(playerName) {
+    let guessType = $("#slGuessType").val() || 'Mst';
     let playerExists = false;
     for (let i = 0; i < importData.length; i++) {
         let findPlayer = importData[i].players.find((player) => {
@@ -123,25 +149,57 @@ function updateTableGuesses(playerName) {
         });
         if (findPlayer !== undefined) {
             playerExists = true;
-            $($(".songData .playerAnswer").get(i)).text(findPlayer.answer);
+            $($(".songData .playerAnswer").get(i)).text(getAnswerForType(findPlayer, guessType));
             $(".playerAnswer").show();
 
             if (findPlayer.active === true) {
-                $($("tr.songData").get(i)).addClass(findPlayer.correct === true ? "rightAnswerTable" : "wrongAnswerTable");
+                let isCorrect = isCorrectForType(findPlayer, guessType);
+                $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
+                $($("tr.songData").get(i)).addClass(isCorrect ? "rightAnswerTable" : "wrongAnswerTable");
             }
             else {
-                $($("tr.songData").get(i)).removeClass("rightAnswerTable");
-                $($("tr.songData").get(i)).removeClass("wrongAnswerTable");
+                $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
             }
         }
         else {
-            $($("tr.songData").get(i)).removeClass("rightAnswerTable");
-            $($("tr.songData").get(i)).removeClass("wrongAnswerTable");
+            $($("tr.songData").get(i)).removeClass("rightAnswerTable wrongAnswerTable");
             $($(".songData .playerAnswer").get(i)).text("...");
             if (!playerExists) {
                 $(".playerAnswer").hide();
             }
         }
+    }
+}
+
+// Friendly display names for known guess type codes
+const GUESS_TYPE_LABELS = {
+    'Mst': 'Visual Novel',
+    'A': 'Artist',
+    'Mt': 'Song Name',
+    'Composer': 'Composer',
+    'Developer': 'Developer',
+};
+
+function updateGuessTypeDropdown(quizIndex) {
+    if (!importData || !importData.quizBoundaries) return;
+    let boundary = importData.quizBoundaries.find(b => b.quizIndex === quizIndex);
+    if (!boundary) return;
+
+    let types = boundary.guessTypes || [];
+    let $select = $("#slGuessType");
+    let current = $select.val();
+
+    $select.empty();
+    for (let type of types) {
+        let label = GUESS_TYPE_LABELS[type] || type;
+        $select.append($("<option></option>").val(type).text(label));
+    }
+
+    // Restore selection if still available, otherwise default to 'Mst'
+    if (current && types.includes(current)) {
+        $select.val(current);
+    } else {
+        $select.val(types.includes('Mst') ? 'Mst' : (types[0] || 'Mst'));
     }
 }
 
