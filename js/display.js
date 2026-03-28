@@ -602,6 +602,7 @@ function play(url, starttime) {
     currentAudio.currentTime = starttime;
     
     const playPromise = currentAudio.play();
+    updatePlayPauseBtn();
     
     if (playPromise !== undefined) {
         playPromise.catch(error => {
@@ -622,6 +623,36 @@ function play(url, starttime) {
 
 let repeat = 0;
 var repeatcount = 0;
+function updatePlayPauseBtn() {
+    var videoPlayer = document.getElementById('videoPlayer');
+    var paused = videoPlayer.paused || videoPlayer.src === '';
+    $("#slPlayPauseBtn").html(paused ? "&#9654;" : "&#9646;&#9646;");
+}
+
+function togglePlayPause() {
+    var videoPlayer = document.getElementById('videoPlayer');
+    if (videoPlayer.paused) {
+        if (videoPlayer.src) {
+            videoPlayer.play();
+        } else if (cursong >= 0) {
+            playsong(cursong);
+        } else if (playlist.length > 0) {
+            playsong(playlist[0]);
+        }
+    } else {
+        videoPlayer.pause();
+    }
+    updatePlayPauseBtn();
+}
+
+function playprevsong() {
+    var index = playlist.findIndex((x) => x == cursong);
+    var previndex;
+    if (index > 0) previndex = playlist[index - 1];
+    else previndex = playlist[playlist.length - 1];
+    playsong(previndex);
+}
+
 function playnextsong() {
     repeat = $("#slRepeat").val() * 1;
     var nextindex;
@@ -647,6 +678,7 @@ function stopsong() {
     videoPlayer.pause();
     if (nextsongtimer != null) clearTimeout(nextsongtimer);
     nextsongtimer = null;
+    updatePlayPauseBtn();
 }
 
 function playsong(index) {

@@ -29,6 +29,9 @@ function setup() {
         updateTableGuesses($("#slPlayerName").val());
     });
     $("#slAutoPlay").on("change", updateAutoPlay);
+    $("#slPrevBtn").click(function() { if (typeof playprevsong === 'function') playprevsong(); });
+    $("#slPlayPauseBtn").click(function() { if (typeof togglePlayPause === 'function') togglePlayPause(); });
+    $("#slNextBtn").click(function() { if (typeof playnextsong === 'function') playnextsong(); });
     $("#slGuessType").on("change", function() {
         updateTableGuesses($("#slPlayerName").val());
         updateTypes();
@@ -392,7 +395,9 @@ function updateVolumeSlider(vol) {
 
 function createVideoPlayer() {
     var videoPlayer = document.getElementById('videoPlayer');
-    videoPlayer.onended = playnextsong;
+    videoPlayer.onended = function() { playnextsong(); updatePlayPauseBtn(); };
+    videoPlayer.onpause = updatePlayPauseBtn;
+    videoPlayer.onplay = updatePlayPauseBtn;
     videoPlayer.onseeked = function() {
         if(videoPlayer.paused) return;
         if($("#slSample").val() !== "all") {
