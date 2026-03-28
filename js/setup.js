@@ -381,6 +381,15 @@ function openSongList(file) {
     reader.readAsText(file);
 }
 
+function updateVolumeSlider(vol) {
+    let pct = Math.round(vol * 100);
+    $("#slVolumeSlider").val(vol);
+    $("#slVolumeSlider").css("background",
+        "linear-gradient(to right, #B6FF00 0%, #B6FF00 " + pct + "%, #555 " + pct + "%, #555 100%)"
+    );
+    $("#slVolumeLabel").text(pct + "%");
+}
+
 function createVideoPlayer() {
     var videoPlayer = document.getElementById('videoPlayer');
     videoPlayer.onended = playnextsong;
@@ -391,7 +400,16 @@ function createVideoPlayer() {
             nextsongtimer = setTimeout(function() { playnextsong() }, length);
         }
     }
-    videoPlayer.volume = getCookie("volume", 1);
+    let savedVolume = getCookie("volume", 1);
+    videoPlayer.volume = savedVolume;
+
+    updateVolumeSlider(savedVolume);
+    $("#slVolumeSlider").on("input change", function() {
+        let vol = parseFloat($(this).val());
+        document.getElementById('videoPlayer').volume = vol;
+        setCookie("volume", vol);
+        updateVolumeSlider(vol);
+    });
     return videoPlayer;
 }
 
@@ -402,6 +420,8 @@ function volumeControl(event) {
     volumetemp = Math.min(Math.max(volumetemp, 0), 1);
     videoPlayer.volume = volumetemp;
     setCookie("volume", volumetemp);
+    // Keep slider in sync when using scroll wheel
+    updateVolumeSlider(volumetemp);
 }
 
 function getCookie(cookieKey, defaultValue) {

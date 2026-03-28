@@ -178,18 +178,78 @@ body {
 #slTableHeader {
     border-bottom: 1px solid #6d6d6d;
     padding: 15px;
-}
-#slTableBody {
-    height: calc(100vh - 268px);
-    overflow-y: auto;
-    overflow-x: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 #slTableHeader h2 {
     margin: 0;
     font-size: 30px;
     line-height: 1.42857143;
-    text-align: center;
     font-weight: normal;
+    flex: 1;
+    text-align: center;
+}
+#slVolumeContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    font-size: 16px;
+}
+#slVolumeSlider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 110px;
+    height: 5px;
+    border-radius: 3px;
+    background: linear-gradient(to right, #B6FF00 0%, #B6FF00 100%, #555 100%);
+    outline: none;
+    cursor: pointer;
+    transition: height 0.15s ease;
+}
+#slVolumeSlider:hover {
+    height: 7px;
+}
+#slVolumeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(182, 255, 0, 0.6), 0 1px 3px rgba(0,0,0,0.5);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+#slVolumeSlider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(182, 255, 0, 0.9), 0 1px 4px rgba(0,0,0,0.5);
+}
+#slVolumeSlider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 4px rgba(182, 255, 0, 0.6), 0 1px 3px rgba(0,0,0,0.5);
+}
+#slVolumeSlider::-moz-range-progress {
+    background: #B6FF00;
+    border-radius: 3px;
+}
+#slVolumeLabel {
+    min-width: 36px;
+    text-align: right;
+    font-size: 12px;
+    color: #aaa;
+    font-variant-numeric: tabular-nums;
+}
+#slTableBody {
+    height: calc(100vh - 268px);
+    overflow-y: auto;
+    overflow-x: auto;
 }
 #slTable {
     color: #d9d9d9;
