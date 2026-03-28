@@ -86,6 +86,11 @@ function testRegex(value, query) {
 }
 
 function updateRow(row) {
+    // Keep collapsed rows hidden regardless of filter state
+    if (row.data("quiz-collapsed")) {
+        row.hide();
+        return;
+    }
     if (row.find(".rowHidden").length === 0 || row.hasClass("rowHidden")) {
         row.show();
     }

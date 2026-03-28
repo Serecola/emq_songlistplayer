@@ -24,10 +24,33 @@ function loadData() {
             let dateStr = boundary && boundary.createdAt
                 ? new Date(boundary.createdAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
                 : ('Quiz ' + quizCounter);
+            let sepQuizIndex = songQuizIndex;
             $("#slTable").append(
-                $("<tr></tr>").addClass("quizSeparator").append(
-                    $("<td></td>").attr("colspan", "7").text("— Quiz " + quizCounter + "  ·  " + dateStr + " —")
-                )
+                $("<tr></tr>")
+                    .addClass("quizSeparator clickable")
+                    .attr("data-quiz-index", sepQuizIndex)
+                    .append(
+                        $("<td></td>").attr("colspan", "7")
+                            .html("<span class='quizCollapseIcon'>&#9660;</span> Quiz " + quizCounter + "  ·  " + dateStr)
+                    )
+                    .click(function() {
+                        let qi = $(this).data("quiz-index");
+                        let isCollapsed = $(this).hasClass("collapsed");
+                        $(this).toggleClass("collapsed");
+                        $("tr.songData[data-quiz-index='" + qi + "']").each(function() {
+                            if (isCollapsed) {
+                                // Re-show only if not hidden by other filters
+                                $(this).data("quiz-collapsed", false);
+                                // Let updateRow decide visibility based on rowHidden cells
+                                let hasHidden = $(this).find(".rowHidden").length > 0;
+                                if (!hasHidden) $(this).show();
+                            } else {
+                                $(this).data("quiz-collapsed", true);
+                                $(this).hide();
+                            }
+                        });
+                        rebuildplaylist();
+                    })
             );
         }
 
@@ -37,6 +60,7 @@ function loadData() {
         $("#slTable").append($("<tr id=" + songid + "></tr>")
             .addClass("songData")
             .addClass("clickable")
+            .attr("data-quiz-index", songQuizIndex)
             .append($("<td></td>")
                 .text(song.songNumber)
                 .addClass("songNumber")
