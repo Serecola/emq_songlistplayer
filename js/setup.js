@@ -1,9 +1,13 @@
 let importData;
 let playerNames = new Set();
+let rawJsonHistory = [];
 
 function setup() {
     $("#slImportButton").click(function () {
         $("#slImport").trigger("click");
+    });
+    $("#slClearButton").click(function () {
+        clearSongList();
     });
     $("#slSearchSongName").on("input", function (event) {
         searchSongName($(this).val());
@@ -289,25 +293,81 @@ function parseDuration(durationStr) {
     return hours * 3600 + minutes * 60 + seconds;
 }
 
+function mergeRawJson(jsonList) {
+    // Merge Room exports and/or legacy flat SongHistory exports into one Quizzes structure
+    let merged = { Quizzes: [] };
+    for (let json of jsonList) {
+        if (json.Quizzes && Array.isArray(json.Quizzes)) {
+            // Room format: directly add all quizzes
+            merged.Quizzes.push(...json.Quizzes);
+        } else if (typeof json === 'object') {
+            // Legacy flat format: wrap the flat dict as a synthetic quiz entry
+            let entries = Object.values(json).filter(v => v && v.Song);
+            if (entries.length > 0) {
+                let songHistories = {};
+                entries.forEach((entry, i) => { songHistories[i] = entry; });
+                merged.Quizzes.push({
+                    Quiz: { id: 'legacy', created_at: entries[0].Song.PlayedAt || '1970-01-01T00:00:00' },
+                    SongHistories: songHistories,
+                    PlayerStats: {}
+                });
+            }
+        }
+    }
+    return merged;
+}
+
+function reloadFromHistory() {
+    playerNames.clear();
+    importData = mergeRawJson(rawJsonHistory);
+    convertData();
+    updateScoreboard();
+    $("#slInfo").hide();
+    $("#slScoreboard").hide();
+    loadData();
+    searchVN($("#slSearchVN").val());
+    searchArtist($("#slSearchArtist").val());
+    searchSongName($("#slSearchSongName").val());
+    updateTypes();
+    // Show/hide clear button based on whether we have data
+    $("#slClearButton").toggle(rawJsonHistory.length > 0);
+    // Reset the file input so the same file can be re-imported if needed
+    $("#slImport").val("");
+}
+
+function clearSongList() {
+    rawJsonHistory = [];
+    playerNames.clear();
+    importData = null;
+    $("#slPlayerName").val("");
+    $('#slPlayerCorrect').removeClass('unchecked');
+    $('#slPlayerIncorrect').removeClass('unchecked');
+    $("tr.songData, tr.quizSeparator").remove();
+    $("#slTable").hide();
+    $("#slTableContainer").hide();
+    $("#slScoreboard").hide();
+    $("#slInfo").hide();
+    $("#slClearButton").hide();
+    stopsong();
+}
+
 function openSongList(file) {
     let reader = new FileReader();
     reader.onload = function () {
         try {
-
+            let parsed = JSON.parse(reader.result);
+            // Accept Room format (has Quizzes array) or legacy flat format (keyed by index with Song entries)
+            let isRoom = parsed.Quizzes && Array.isArray(parsed.Quizzes);
+            let isFlat = !isRoom && typeof parsed === 'object' && Object.values(parsed).some(v => v && v.Song);
+            if (!isRoom && !isFlat) {
+                alert("Unsupported format: expected a Room JSON or a flat SongHistory JSON.");
+                return;
+            }
             $("#slPlayerName").val("");
             $('#slPlayerCorrect').removeClass('unchecked');
             $('#slPlayerIncorrect').removeClass('unchecked');
-            playerNames.clear();
-            importData = JSON.parse(reader.result);
-            convertData();
-            updateScoreboard();
-            $("#slInfo").hide();
-            $("#slScoreboard").hide();
-            loadData();
-            searchVN($("#slSearchVN").val());
-            searchArtist($("#slSearchArtist").val());
-            searchSongName($("#slSearchSongName").val());
-            updateTypes();
+            rawJsonHistory.push(parsed);
+            reloadFromHistory();
         }
         catch (e) {
             if (e instanceof SyntaxError) {

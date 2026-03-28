@@ -26,6 +26,9 @@ body {
     width: calc(100% - 250px);
     float: left; 
 }
+#slClearButton {
+    margin-left: 6px;
+}
 #slHeaderLeft h1 {
     font-weight: normal;
     padding: 15px 15px 0px 15px;
@@ -98,37 +101,37 @@ body {
 #slAutoPlay {
     color: black;
     width: 80px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slRepeat {
     color: black;
     width: 80px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slPlayOrder {
     color: black;
     width: 100px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slSample {
     color: black;
     width: 80px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slLength {
     color: black;
     width: 80px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slGuessType {
     color: black;
     width: 105px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 #slHost {
     color: black;
     width: 160px;
-    margin-top: 15px;
+    margin-top: 5px;
 }
 
 #slHeaderPlayer {

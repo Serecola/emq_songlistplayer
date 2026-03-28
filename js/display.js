@@ -10,7 +10,7 @@ function loadData() {
     $("#slInfo").show();
     clearInfo();
     clearScoreboard();
-    $("tr.songData").remove();
+    $("tr.songData, tr.quizSeparator").remove();
     let songid = 0;
     let lastQuizIndex = -1;
     let quizCounter = 0;
