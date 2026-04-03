@@ -333,6 +333,15 @@ tr.header > td {
 .songNumber {
     min-width: 60px;
 }
+.vnNameRomaji {
+    min-width: 150px;
+}
+.songName {
+    min-width: 200px;
+}
+.songArtist {
+    min-width: 150px;
+}
 .songType {
     min-width: 80px;
 }

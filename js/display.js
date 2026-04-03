@@ -66,16 +66,16 @@ function loadData() {
                 .addClass("songNumber")
             )
             .append($("<td></td>")
+                .text(song.visualnovel.romaji)
+                .addClass("vnNameRomaji")
+            )
+            .append($("<td></td>")
                 .text(song.name)
                 .addClass("songName")
             )
             .append($("<td></td>")
                 .text(song.artist)
                 .addClass("songArtist")
-            )
-            .append($("<td></td>")
-                .text(song.visualnovel.romaji)
-                .addClass("vnNameRomaji")
             )
             .append($("<td></td>")
                 .text(song.type)
@@ -501,7 +501,7 @@ function updateInfo(song) {
 						$("<a></a>")
 							.attr("href", shortestVideo.Url)
 							.attr("target", "_blank")
-							.text(shortestVideo.Url),
+							.text(shortestVideo.Url.split("/").pop()),
 						$("<span></span>").text(` (${formatDuration(shortestVideo.Duration)})`)
 					)
 				);
@@ -514,7 +514,7 @@ function updateInfo(song) {
 						$("<a></a>")
 							.attr("href", shortestAudio.Url)
 							.attr("target", "_blank")
-							.text(shortestAudio.Url),
+							.text(shortestAudio.Url.split("/").pop()),
 						$("<span></span>").text(` (${formatDuration(shortestAudio.Duration)})`)
 					)
 				);
