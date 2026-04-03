@@ -169,9 +169,23 @@
                 <div id="slTableHeader">
                     <h2>Song List</h2>
                     <div id="slMediaControls">
-                        <button id="slPrevBtn" class="slMediaBtn" title="Previous">&#9664;&#9664;</button>
-                        <button id="slPlayPauseBtn" class="slMediaBtn" title="Play/Pause">&#9654;</button>
-                        <button id="slNextBtn" class="slMediaBtn" title="Next">&#9654;&#9654;</button>
+                        <button id="slPrevBtn" class="slMediaBtn" title="Previous">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.52-.302 1.233.043 1.233.696v7.384c0 .653-.713.998-1.233.696L6 8.752V12a.5.5 0 0 1-1 0V4z"/>
+                                <path d="M3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 3 4z"/>
+                            </svg>
+                        </button>
+                        <button id="slPlayPauseBtn" class="slMediaBtn" title="Play/Pause">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+                            </svg>
+                        </button>
+                        <button id="slNextBtn" class="slMediaBtn" title="Next">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M12 4a.5.5 0 0 0-1 0v3.248L4.733 3.612C4.213 3.31 3.5 3.655 3.5 4.308v7.384c0 .653.713.998 1.233.696L11 8.752V12a.5.5 0 0 0 1 0V4z"/>
+                                <path d="M13 4a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 1 0v-7A.5.5 0 0 0 13 4z"/>
+                            </svg>
+                        </button>
                     </div>
                     <div id="slVolumeContainer">
                         <span>&#128266;</span>
