@@ -336,35 +336,61 @@ function updateInfo(song) {
             .attr("class", "slInfoRow");
         let infoRow1 = $("<div></div>")
             .attr("class", "slInfoRow");
+        let infoRowCredits = $("<div></div>")
+            .attr("class", "slInfoRow")
+            .attr("id", "slInfoCreditsRow");
+        let infoDeveloperRow = $("<div></div>")
+            .attr("class", "slInfoRow");
         let infoRow2 = $("<div></div>")
             .attr("class", "slInfoRow");
         let infoRow3 = $("<div></div>")
             .attr("class", "slInfoRow");
 
         let correctGuesses = song.correctCount || song.players.filter((tmpPlayer) => tmpPlayer.correct === true).length;
-		let totalPlayers = song.activePlayers;
-		let guessedPercentage = totalPlayers > 0 ? parseFloat((correctGuesses / totalPlayers * 100).toFixed(2)) : 0;
+        let totalPlayers = song.activePlayers;
+        let guessedPercentage = totalPlayers > 0 ? parseFloat((correctGuesses / totalPlayers * 100).toFixed(2)) : 0;
 
-		let guesses = song.players.filter(player => player.correct === true);
+        let guesses = song.players.filter(player => player.correct === true);
 
-		// Build running totals up to this song for "Name total (+perSong)" display
-		// Scoped to the same quiz so scores reset per quiz
-		let runningTotals = {};
-		let songQuizIndex = song.quizIndex !== undefined ? song.quizIndex : 0;
-		for (let i = 0; i <= song.songid; i++) {
-			let s = importData[i];
-			if (!s) continue;
-			if ((s.quizIndex !== undefined ? s.quizIndex : 0) !== songQuizIndex) continue;
-			s.players.forEach(p => {
-				if (!runningTotals[p.name]) runningTotals[p.name] = 0;
-				runningTotals[p.name] += (p.categoryCorrect !== undefined ? p.categoryCorrect : (p.correct ? 1 : 0));
-			});
-		}
-		function formatGuessedEntry(player) {
-			let total = runningTotals[player.name] || 0;
-			let perSong = player.categoryCorrect !== undefined ? player.categoryCorrect : (player.correct ? 1 : 0);
-			return player.name + " " + total + " (+" + perSong + ")";
-		}
+        let runningTotals = {};
+        let songQuizIndex = song.quizIndex !== undefined ? song.quizIndex : 0;
+        for (let i = 0; i <= song.songid; i++) {
+            let s = importData[i];
+            if (!s) continue;
+            if ((s.quizIndex !== undefined ? s.quizIndex : 0) !== songQuizIndex) continue;
+            s.players.forEach(p => {
+                if (!runningTotals[p.name]) runningTotals[p.name] = 0;
+                runningTotals[p.name] += (p.categoryCorrect !== undefined ? p.categoryCorrect : (p.correct ? 1 : 0));
+            });
+        }
+        function formatGuessedEntry(player) {
+            let total = runningTotals[player.name] || 0;
+            let perSong = player.categoryCorrect !== undefined ? player.categoryCorrect : (player.correct ? 1 : 0);
+            return player.name + " " + total + " (+" + perSong + ")";
+        }
+
+        let composers = [];
+        let arrangers = [];
+        let lyricists = [];
+        
+        if (song.rawArtists && song.rawArtists.length > 0) {
+            for (let artist of song.rawArtists) {
+                let roles = artist.Roles || [];
+                let artistName = artist.Titles && artist.Titles[0] ? artist.Titles[0].LatinTitle : "";
+                if (!artistName && artist.Titles && artist.Titles[0]) {
+                    artistName = artist.Titles[0].NonLatinTitle || "";
+                }
+                if (roles.includes("Composer")) {
+                    composers.push(artistName);
+                }
+                if (roles.includes("Arranger")) {
+                    arrangers.push(artistName);
+                }
+                if (roles.includes("Lyricist")) {
+                    lyricists.push(artistName);
+                }
+            }
+        }
 
         let infoSongName = $("<div></div>")
             .attr("id", "slInfoSongName")
@@ -372,18 +398,32 @@ function updateInfo(song) {
         let infoArtist = $("<div></div>")
             .attr("id", "slInfoArtist")
             .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
+        let infoType = $("<div></div>")
+            .attr("id", "slInfoType")
+            .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
+        
+        let infoComposer = $("<div></div>")
+            .attr("id", "slInfoComposer")
+            .html("<h5><b>Composer</b></h5><p>" + (composers.length > 0 ? composers.join(", ") : "—") + "</p>");
+        let infoArranger = $("<div></div>")
+            .attr("id", "slInfoArranger")
+            .html("<h5><b>Arranger</b></h5><p>" + (arrangers.length > 0 ? arrangers.join(", ") : "—") + "</p>");
+        let infoLyricist = $("<div></div>")
+            .attr("id", "slInfoLyricist")
+            .html("<h5><b>Lyricist</b></h5><p>" + (lyricists.length > 0 ? lyricists.join(", ") : "—") + "</p>");
+        
         let infoVNEnglish = $("<div></div>")
             .attr("id", "slInfoVNEnglish")
             .html("<h5><b>VN English</b></h5><p>" + (song.visualnovel.english || "") + "</p>");
         let infoVNRomaji = $("<div></div>")
             .attr("id", "slInfoVNRomaji")
             .html("<h5><b>VN Romaji</b></h5><p>" + (song.visualnovel.romaji || "") + "</p>");
-        let infoType = $("<div></div>")
-            .attr("id", "slInfoType")
-            .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
+        let infoDeveloper = $("<div></div>")
+            .attr("id", "slInfoDeveloper")
+            .html("<h5><b>Developer</b></h5><p>" + (song.developer || "—") + "</p>");
         let infoGuessed = $("<div></div>")
-			.attr("id", "slInfoGuessed")
-			.html("<h5><b>Guessed<br>" + correctGuesses + "/" + totalPlayers + " (" + guessedPercentage + "%)</b></h5>");
+            .attr("id", "slInfoGuessed")
+            .html("<h5><b>Guessed<br>" + correctGuesses + "/" + totalPlayers + " (" + guessedPercentage + "%)</b></h5>");
         let infoFromList = $("<div></div>")
             .attr("id", "slInfoFromList")
             .html("<h5><b>From Lists<br>" + song.fromList.length + "/" + song.totalPlayers + " (" + parseFloat((song.fromList.length / song.totalPlayers * 100).toFixed(2)) + "%)</b></h5>");
@@ -391,7 +431,6 @@ function updateInfo(song) {
             .attr("id", "slInfoUrls")
             .html("<h5><b>URLs</b></h5>");
 
-        // Hide VN English or VN Romaji if they don't exist
         let hasVNEnglish = song.visualnovel.english && song.visualnovel.english.trim() !== "";
         let hasVNRomaji = song.visualnovel.romaji && song.visualnovel.romaji.trim() !== "";
         
@@ -402,7 +441,6 @@ function updateInfo(song) {
             infoVNRomaji.hide();
         }
 
-        // Center the title if only one of VN English or VN Romaji exists
         if (hasVNEnglish !== hasVNRomaji) {
             infoRow0.addClass("slInfoRowCentered");
         }
@@ -414,47 +452,60 @@ function updateInfo(song) {
         infoRow1.append(infoArtist);
         infoRow1.append(infoType);
 
-        infoRow2.append(infoUrls);
+        infoRowCredits.append(infoComposer);
+        infoRowCredits.append(infoArranger);
+        infoRowCredits.append(infoLyricist);
 
+        let hasAnyCredit = composers.length > 0 || arrangers.length > 0 || lyricists.length > 0;
+        if (!hasAnyCredit) {
+            infoRowCredits.hide();
+        }
+
+        infoDeveloperRow.append(infoDeveloper);
+        if (!song.developer || song.developer === "") {
+            infoDeveloperRow.hide();
+        }
+
+        infoRow2.append(infoUrls);
         infoRow3.append(infoGuessed);
         infoRow3.append(infoFromList);
 
         let infoListContainer;
         if (song.fromList.length === 0) {
-			infoGuessed.css("width", "98%");
-			infoFromList.hide();
-			if (guesses.length > 1) {
-				let infoGuessedLeft = $("<ul></ul>")
-					.attr("id", "slInfoGuessedLeft");
-				let infoGuessedRight = $("<ul></ul>")
-					.attr("id", "slInfoGuessedRight");
-				let i = 0;
-				for (let guessed of guesses) {
-					if (i++ % 2 === 0) {
-						infoGuessedLeft.append($("<li></li>")
-							.text(formatGuessedEntry(guessed))
-						);
-					}
-					else {
-						infoGuessedRight.append($("<li></li>")
-							.text(formatGuessedEntry(guessed))
-						);
-					}
-				}
-				infoGuessed.append(infoGuessedLeft);
-				infoGuessed.append(infoGuessedRight);
-			}
-			else if (guesses.length > 0) {
-				infoListContainer = $("<ul></ul>")
-					.attr("id", "slInfoGuessedList");
-				for (let guessed of guesses) {
-					infoListContainer.append($("<li></li>")
-						.text(formatGuessedEntry(guessed))
-					);
-				}
-				infoGuessed.append(infoListContainer);
-			}
-		}
+            infoGuessed.css("width", "98%");
+            infoFromList.hide();
+            if (guesses.length > 1) {
+                let infoGuessedLeft = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedLeft");
+                let infoGuessedRight = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedRight");
+                let i = 0;
+                for (let guessed of guesses) {
+                    if (i++ % 2 === 0) {
+                        infoGuessedLeft.append($("<li></li>")
+                            .text(formatGuessedEntry(guessed))
+                        );
+                    }
+                    else {
+                        infoGuessedRight.append($("<li></li>")
+                            .text(formatGuessedEntry(guessed))
+                        );
+                    }
+                }
+                infoGuessed.append(infoGuessedLeft);
+                infoGuessed.append(infoGuessedRight);
+            }
+            else if (guesses.length > 0) {
+                infoListContainer = $("<ul></ul>")
+                    .attr("id", "slInfoGuessedList");
+                for (let guessed of guesses) {
+                    infoListContainer.append($("<li></li>")
+                        .text(formatGuessedEntry(guessed))
+                    );
+                }
+                infoGuessed.append(infoListContainer);
+            }
+        }
         else {
             infoGuessed.css("width", "");
             infoListContainer = $("<ul></ul>")
@@ -474,82 +525,83 @@ function updateInfo(song) {
         }
         infoFromList.append(infoListContainer);
 
-		// Updated URL display section
-		infoListContainer = $("<ul></ul>").attr("id", "slInfoUrlList");
+        infoListContainer = $("<ul></ul>").attr("id", "slInfoUrlList");
 
-		function parseDuration(durationStr) {
-			if (!durationStr) return 0;
-			const parts = durationStr.split(':');
-			if (parts.length >= 3) {
-				const hh = parseInt(parts[0]) || 0;
-				const mm = parseInt(parts[1]) || 0;
-				const ss = parseFloat(parts[2]) || 0;
-				return hh * 3600 + mm * 60 + ss;
-			}
-			return 0;
-		}
+        function parseDuration(durationStr) {
+            if (!durationStr) return 0;
+            const parts = durationStr.split(':');
+            if (parts.length >= 3) {
+                const hh = parseInt(parts[0]) || 0;
+                const mm = parseInt(parts[1]) || 0;
+                const ss = parseFloat(parts[2]) || 0;
+                return hh * 3600 + mm * 60 + ss;
+            }
+            return 0;
+        }
 
-		function formatDuration(durationStr) {
-			if (!durationStr) return "";
-			const parts = durationStr.split(':');
-			if (parts.length >= 3) {
-				const seconds = parts[2].split('.')[0];
-				return `${parts[1]}:${seconds.padStart(2, '0')}`;
-			}
-			return durationStr;
-		}
+        function formatDuration(durationStr) {
+            if (!durationStr) return "";
+            const parts = durationStr.split(':');
+            if (parts.length >= 3) {
+                const seconds = parts[2].split('.')[0];
+                return `${parts[1]}:${seconds.padStart(2, '0')}`;
+            }
+            return durationStr;
+        }
 
-		if (song.links && song.links.length > 0) {
-			const videoLinks = song.links.filter(link => link.IsVideo);
-			const shortestVideo = videoLinks.reduce((shortest, current) => {
-				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
-			}, videoLinks[0]);
+        if (song.links && song.links.length > 0) {
+            const videoLinks = song.links.filter(link => link.IsVideo);
+            const shortestVideo = videoLinks.reduce((shortest, current) => {
+                return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
+            }, videoLinks[0]);
 
-			const audioLinks = song.links.filter(link => !link.IsVideo);
-			const shortestAudio = audioLinks.reduce((shortest, current) => {
-				return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
-			}, audioLinks[0]);
+            const audioLinks = song.links.filter(link => !link.IsVideo);
+            const shortestAudio = audioLinks.reduce((shortest, current) => {
+                return parseDuration(current.Duration) < parseDuration(shortest.Duration) ? current : shortest;
+            }, audioLinks[0]);
 
-			if (shortestVideo) {
-				infoListContainer.append(
-					$("<li></li>").append(
-						$("<span></span>").text("Video: "),
-						$("<a></a>")
-							.attr("href", shortestVideo.Url)
-							.attr("target", "_blank")
-							.text(truncateUrl(shortestVideo.Url)),
-						$("<span></span>").text(` (${formatDuration(shortestVideo.Duration)})`)
-					)
-				);
-			}
+            if (shortestVideo) {
+                infoListContainer.append(
+                    $("<li></li>").append(
+                        $("<span></span>").text("Video: "),
+                        $("<a></a>")
+                            .attr("href", shortestVideo.Url)
+                            .attr("target", "_blank")
+                            .text(truncateUrl(shortestVideo.Url)),
+                        $("<span></span>").text(` (${formatDuration(shortestVideo.Duration)})`)
+                    )
+                );
+            }
 
-			if (shortestAudio) {
-				infoListContainer.append(
-					$("<li></li>").append(
-						$("<span></span>").text("Audio: "),
-						$("<a></a>")
-							.attr("href", shortestAudio.Url)
-							.attr("target", "_blank")
-							.text(truncateUrl(shortestAudio.Url)),
-						$("<span></span>").text(` (${formatDuration(shortestAudio.Duration)})`)
-					)
-				);
-			}
+            if (shortestAudio) {
+                infoListContainer.append(
+                    $("<li></li>").append(
+                        $("<span></span>").text("Audio: "),
+                        $("<a></a>")
+                            .attr("href", shortestAudio.Url)
+                            .attr("target", "_blank")
+                            .text(truncateUrl(shortestAudio.Url)),
+                        $("<span></span>").text(` (${formatDuration(shortestAudio.Duration)})`)
+                    )
+                );
+            }
 
-			if (!shortestVideo && !shortestAudio) {
-				infoListContainer.append(
-					$("<li></li>").text("No media links available")
-				);
-			}
-		} else {
-			infoListContainer.append(
-				$("<li></li>").text("No media links available")
-			);
-		}
-		infoUrls.append(infoListContainer);
+            if (!shortestVideo && !shortestAudio) {
+                infoListContainer.append(
+                    $("<li></li>").text("No media links available")
+                );
+            }
+        } else {
+            infoListContainer.append(
+                $("<li></li>").text("No media links available")
+            );
+        }
+        infoUrls.append(infoListContainer);
 
         $("#slInfoBody").append(infoRow0);
         $("#slInfoBody").append(infoRow1);
+        $("#slInfoBody").append(infoRowCredits);
+        $("#slInfoBody").append(infoDeveloperRow);
         $("#slInfoBody").append(infoRow2);
         $("#slInfoBody").append(infoRow3);
     }
@@ -559,51 +611,49 @@ function updateInfo(song) {
 
     const autoplayEnabled = $("#slAutoPlay").val() === "on";
     if (autoplayEnabled) {
-    // Find all audio links
-    const audioLinks = song.links.filter(link => !link.IsVideo);
-		
-		if (audioLinks.length > 0) {
-			// Find the shortest audio link
-			const shortestAudio = audioLinks.reduce((shortest, current) => {
-				const shortestDuration = parseDuration(shortest.Duration);
-				const currentDuration = parseDuration(current.Duration);
-				return currentDuration < shortestDuration ? current : shortest;
-			});
-			
-			var length = parseInt($("#slLength").val());
-			var starttime = 0;
-			if ($("#slSample").val() === "random") {
-				starttime = Math.random() * (parseDuration(shortestAudio.Duration) - length - 5);
-				if (starttime < 0) starttime = 0;
-			} else if ($("#slSample").val() === "start") {
-				starttime = 0.2;
-			} else if ($("#slSample").val() === "mid") {
-				starttime = (parseDuration(shortestAudio.Duration) - length) * 0.5;
-			} else if ($("#slSample").val() === "end") {
-				starttime = parseDuration(shortestAudio.Duration) - length - 5;
-			}
-			if (starttime < 0) starttime = 0;
-			
-			play(shortestAudio.Url, starttime);
-		} else {
-			for (let res of reslist) {
-				for (let host of hostlist) {
-					if (song.urls[host] !== undefined) {
-						if (song.urls[host][res] !== undefined) {
-							var starttime = 0;
-							if ($("#slSample").val() === "random") starttime = Math.random() * (song.videoLength - length - 5);
-							else if ($("#slSample").val() === "start") starttime = .2;
-							else if ($("#slSample").val() === "mid") starttime = (song.videoLength - length) * .5;
-							else if ($("#slSample").val() === "end") starttime = song.videoLength - length - 5;
-							if (starttime < 0) starttime = 0;
-							play(song.urls[host][res], starttime);
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
+        const audioLinks = song.links.filter(link => !link.IsVideo);
+        
+        if (audioLinks.length > 0) {
+            const shortestAudio = audioLinks.reduce((shortest, current) => {
+                const shortestDuration = parseDuration(shortest.Duration);
+                const currentDuration = parseDuration(current.Duration);
+                return currentDuration < shortestDuration ? current : shortest;
+            });
+            
+            var length = parseInt($("#slLength").val());
+            var starttime = 0;
+            if ($("#slSample").val() === "random") {
+                starttime = Math.random() * (parseDuration(shortestAudio.Duration) - length - 5);
+                if (starttime < 0) starttime = 0;
+            } else if ($("#slSample").val() === "start") {
+                starttime = 0.2;
+            } else if ($("#slSample").val() === "mid") {
+                starttime = (parseDuration(shortestAudio.Duration) - length) * 0.5;
+            } else if ($("#slSample").val() === "end") {
+                starttime = parseDuration(shortestAudio.Duration) - length - 5;
+            }
+            if (starttime < 0) starttime = 0;
+            
+            play(shortestAudio.Url, starttime);
+        } else {
+            for (let res of reslist) {
+                for (let host of hostlist) {
+                    if (song.urls[host] !== undefined) {
+                        if (song.urls[host][res] !== undefined) {
+                            var starttime = 0;
+                            if ($("#slSample").val() === "random") starttime = Math.random() * (song.videoLength - length - 5);
+                            else if ($("#slSample").val() === "start") starttime = .2;
+                            else if ($("#slSample").val() === "mid") starttime = (song.videoLength - length) * .5;
+                            else if ($("#slSample").val() === "end") starttime = song.videoLength - length - 5;
+                            if (starttime < 0) starttime = 0;
+                            play(song.urls[host][res], starttime);
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 var nextsongtimer = null;
 
@@ -617,8 +667,6 @@ function clearScoreboard() {
 
 function truncateUrl(url) {
     if (!url) return url;
-    // Extract the filename/UUID part from URLs like:
-    // https://erogemusicquiz.com/selfhoststorage/userup/weba/9f4e9ee8-bd16-4f1a-aca6-2ebaca2a34cf.weba
     const parts = url.split('/');
     return parts.length > 0 ? parts[parts.length - 1] : url;
 }

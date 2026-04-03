@@ -98,12 +98,7 @@ body {
     margin-top: 15px;
     margin-left: 2%;
 }
-#slAutoPlay {
-    color: black;
-    width: 80px;
-    margin-top: 5px;
-}
-#slRepeat {
+#slAutoPlay, #slRepeat, #slSample, #slLength {
     color: black;
     width: 80px;
     margin-top: 5px;
@@ -113,27 +108,11 @@ body {
     width: 100px;
     margin-top: 5px;
 }
-#slSample {
-    color: black;
-    width: 80px;
-    margin-top: 5px;
-}
-#slLength {
-    color: black;
-    width: 80px;
-    margin-top: 5px;
-}
 #slGuessType {
     color: black;
     width: 105px;
     margin-top: 5px;
 }
-#slHost {
-    color: black;
-    width: 160px;
-    margin-top: 5px;
-}
-
 #slHeaderPlayer {
     width: 200px;
     float: right;
@@ -144,17 +123,16 @@ body {
     width: 90%;
     margin-left: 5%;
 }
-#slPlayerAnswerContainer {
+#slPlayerAnswerContainer, #slPlayerCorrectContainer {
     width: 100px;
-    float: left;
     text-align: center;
     margin-top: 15px;
 }
+#slPlayerAnswerContainer {
+    float: left;
+}
 #slPlayerCorrectContainer {
     float: right;
-    text-align: center;
-    margin-top: 15px;
-    width: 100px;
 }
 #slMain {
     overflow-x: auto;
@@ -167,8 +145,7 @@ body {
     color: #d9d9d9;
     width: calc(59% - 120px);
     min-width: 450px;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    overflow: hidden;
     background-color: #424242;
     box-shadow: 0 0 10px 2px rgb(0, 0, 0);
     display: none;
@@ -339,9 +316,6 @@ tr.header > td {
 .guessesCounter {
     min-width: 75px;
 }
-.samplePoint {
-    min-width: 70px;
-}
 .playerAnswer {
     display: none;
 }
@@ -417,9 +391,6 @@ tr.header > td {
     background-color: rgba(128, 199, 255, 0.15);
     box-shadow: inset 0 0 0 1px rgba(128, 199, 255, 0.3);
 }
-.disabled {
-    opacity: 0.4;
-}
 .rightAnswerScoreboard {
     text-shadow: 0 0 5px #fff, 0 0 10px #B6FF00, 0 0 15px #B6FF00;
 }
@@ -446,17 +417,11 @@ tr.header > td {
     color: #fff;
     text-shadow: 0 0 5px #B6FF00, 0 0 10px #B6FF00, 0 0 15px #B6FF00;
 }
-.slScoreboardScore.noScore {
-    color: #d9d9d9;
-}
 .slScoreboardName {
     flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-.slScoreboardCorrectGuesses {
-    opacity: 0.3;
 }
 .hide {
     display: none !important;
@@ -469,10 +434,8 @@ tr.header > td {
     box-shadow: 0 0 10px 2px rgb(0, 0, 0);
     min-width: 370px;
     height: calc(100vh - 195px);
-    overflow-y: hidden;
-    overflow-x: hidden;
+    overflow: hidden;
     display: none;
-    /* float: left; */
     margin-left: 10px;
 }
 #slInfoBody {
@@ -496,120 +459,112 @@ tr.header > td {
     font-weight: normal;
 }
 .slInfoRow {
+    display: flex;
+    flex-wrap: wrap;
     width: 98%;
-    height: auto;
-    text-align: center;
-    clear: both;
+    margin: 20px auto;
 }
-.slInfoRowCentered > div {
-    margin: 1% auto;
-    float: none;
+.slInfoRow:first-child {
+    margin-top: 10px;
+}
+.slInfoRow:last-child {
+    margin-bottom: 10px;
 }
 .slInfoRow > div {
-    margin: 1%;
+    flex: 1;
+    min-width: 30%;
+    margin: 0 1%;
     text-align: center;
-    float: left;
+    overflow-wrap: break-word;
 }
 .slInfoRow > div h5 {
     font-weight: bold;
-    font-size: 16px;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
-#slInfoSongName {
-    width: 38%;
-    overflow-wrap: break-word;
+.slInfoRow > div p {
+    margin: 0;
 }
-#slInfoArtist {
-    width: 38%;
-    overflow-wrap: break-word;
+#slInfoCreditsRow {
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
-#slInfoType{
-    width: 18%;
-    overflow-wrap: break-word; 
+#slInfoSongName, #slInfoArtist, #slInfoType {
+    flex: 1;
 }
-#slInfoVNEnglish {
-    width: 48%;
-    overflow-wrap: break-word;
+#slInfoComposer, #slInfoArranger, #slInfoLyricist {
+    flex: 1;
 }
-#slInfoVNRomaji {
-    width: 48%;
-    overflow-wrap: break-word;
+#slInfoVNEnglish, #slInfoVNRomaji {
+    flex: 1;
+}
+#slInfoVNEnglish:empty, #slInfoVNRomaji:empty {
+    display: none;
+}
+.slInfoRow:has(#slInfoVNEnglish:empty):has(#slInfoVNRomaji:not(:empty)) #slInfoVNRomaji,
+.slInfoRow:has(#slInfoVNRomaji:empty):has(#slInfoVNEnglish:not(:empty)) #slInfoVNEnglish {
+    flex: 1;
+    width: 100%;
 }
 #slInfoUrls {
     width: 100%;
+    flex: 100%;
 }
-#slInfoGuessed {
-    width: 48%;
-    float: left;
+#slInfoGuessed, #slInfoFromList {
+    flex: 1;
 }
-#slInfoGuessedLeft {
-    width: 48%;
-    margin: 1%;
-    float: left;
+#slInfoGuessed ul, #slInfoFromList ul {
+    text-align: left;
+    display: inline-block;
+    margin: 0 auto;
 }
-#slInfoGuessedRight {
-    width: 48%;
-    margin: 1%;
-    float: left;
+#player video {
+    width: 100%;
 }
-#slInfoFromList {
-    width: 48%;
-    float: left;
-}
-
-/* Mobile responsiveness */
 @media screen and (max-width: 1200px) {
     #slHeader {
         height: auto;
         min-height: 150px;
     }
-    
     #slHeaderLeft {
         width: 100%;
         float: none;
         border-right: none;
         border-bottom: 1px solid #6d6d6d;
     }
-    
     #slHeaderRight {
         width: 100%;
         float: none;
     }
-    
     #slHeaderSearch {
         width: 100%;
         padding: 10px;
         border-right: none;
         height: auto;
     }
-    
     .slSearchContainer {
         width: 100%;
         margin: 5px 0;
     }
-    
     #slHeaderFilter {
         width: 100%;
         margin: 10px 0;
     }
-    
     #slHeaderTypeFilters {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
     }
-    
     .slTypeFilter {
         width: auto;
         margin: 0 10px;
     }
-
     .slDropdownContainer {
         width: auto;
         float: none;
         display: inline-block;
         margin: 10px;
     }
-    
     #slHeaderPlayer {
         width: 100%;
         float: none;
@@ -617,30 +572,51 @@ tr.header > td {
         padding: 10px;
         text-align: center;
     }
-    
-    #slPlayerAnswerContainer,
-    #slPlayerCorrectContainer {
+    #slPlayerAnswerContainer, #slPlayerCorrectContainer {
         display: inline-block;
         margin: 10px;
         float: none;
     }
 }
-
 @media screen and (max-width: 768px) {
     #slMain {
         flex-direction: column;
         height: auto;
     }
-    
-    #slTableContainer,
-    #slScoreboard,
-    #slInfo {
+    #slTableContainer, #slScoreboard, #slInfo {
         width: 100%;
         margin: 10px 0;
         float: none;
     }
-    
     #slTableContainer {
         min-width: unset;
     }
+    .slInfoRow {
+        flex-direction: column;
+        margin: 15px auto;
+    }
+    .slInfoRow > div {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+#slInfoDeveloper {
+    flex: 1;
+    text-align: center;
+    overflow-wrap: break-word;
+}
+
+#slInfoDeveloper h5 {
+    font-weight: bold;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.slInfoRow:has(#slInfoDeveloper) {
+    justify-content: center;
+}
+
+#slInfoDeveloper:empty {
+    display: none;
 }
