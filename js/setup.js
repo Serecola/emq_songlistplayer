@@ -144,6 +144,19 @@ function convertData() {
         let englishTitle = song.Sources[0].Titles.find(t => t.Language === "en")?.LatinTitle || "";
         let romajiTitle = song.Sources[0].Titles.find(t => t.Language === "ja")?.LatinTitle || song.Sources[0].Titles[0].LatinTitle;
         
+        let developerNames = [];
+        if (song.Sources && song.Sources.length > 0 && song.Sources[0].Developers && song.Sources[0].Developers.length > 0) {
+            for (let dev of song.Sources[0].Developers) {
+                if (dev.Title) {
+                    let devName = dev.Title.LatinTitle || dev.Title.NonLatinTitle || "";
+                    if (devName) {
+                        developerNames.push(devName);
+                    }
+                }
+            }
+        }
+        let developerString = developerNames.join(", ");
+
         let tempSong = {
             quizIndex: quizIndex,
             gameMode: "Standard",
@@ -152,6 +165,8 @@ function convertData() {
                 .filter(a => a.Roles && a.Roles.includes("Vocals"))
                 .map(a => a.Titles[0].LatinTitle)
                 .join(", "),
+            rawArtists: song.Artists,
+            developer: developerString,
             visualnovel: {
                 english: englishTitle,
                 romaji: romajiTitle
@@ -159,11 +174,11 @@ function convertData() {
             songNumber: songNumber++,
             type: songType,
             urls: {},
-            activePlayers: 0,   // filled after processing PlayerGuessInfos
+            activePlayers: 0,
             totalPlayers: songData.PlayerGuessInfos ? Object.keys(songData.PlayerGuessInfos).length : 0,
             players: [],
-            fromList: [], // Now will just store names
-            correctCount: 0,    // filled after processing PlayerGuessInfos
+            fromList: [],
+            correctCount: 0,
             videoLength: 0,
             startSample: 0,
             links: []
