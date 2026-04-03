@@ -640,7 +640,13 @@ var repeatcount = 0;
 function updatePlayPauseBtn() {
     var videoPlayer = document.getElementById('videoPlayer');
     var paused = videoPlayer.paused || videoPlayer.src === '';
-    $("#slPlayPauseBtn").html(paused ? "&#9654;" : "&#9646;&#9646;");
+    if (paused) {
+        $("#slPlayPauseBtn .play-icon").show();
+        $("#slPlayPauseBtn .pause-icon").hide();
+    } else {
+        $("#slPlayPauseBtn .play-icon").hide();
+        $("#slPlayPauseBtn .pause-icon").show();
+    }
 }
 
 function togglePlayPause() {
