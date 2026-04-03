@@ -712,7 +712,14 @@ var repeatcount = 0;
 function updatePlayPauseBtn() {
     var videoPlayer = document.getElementById('videoPlayer');
     var paused = videoPlayer.paused || videoPlayer.src === '';
-    $("#slPlayPauseBtn").html(paused ? "&#9654;" : "&#9646;&#9646;");
+    
+    if (paused) {
+        $("#slPlayIcon").show();
+        $("#slPauseIcon").hide();
+    } else {
+        $("#slPlayIcon").hide();
+        $("#slPauseIcon").show();
+    }
 }
 
 function togglePlayPause() {
