@@ -279,7 +279,13 @@ function updateScoreboard(selectedSong) {
 
         let score = document.createElement('span');
         score.className = 'slScoreboardScore';
-        score.textContent = `${player.correct}`;
+        if (player.correct > 0) {
+            score.classList.add('hasScore');
+            score.textContent = `${player.correct}`;
+        } else {
+            score.classList.add('noScore');
+            score.textContent = '';
+        }
 
         let name = document.createElement('span');
         name.className = 'slScoreboardName';
