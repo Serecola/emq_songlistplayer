@@ -392,11 +392,19 @@ function updateInfo(song) {
             .html("<h5><b>URLs</b></h5>");
 
         // Hide VN English or VN Romaji if they don't exist
-        if (!song.visualnovel.english || song.visualnovel.english.trim() === "") {
+        let hasVNEnglish = song.visualnovel.english && song.visualnovel.english.trim() !== "";
+        let hasVNRomaji = song.visualnovel.romaji && song.visualnovel.romaji.trim() !== "";
+        
+        if (!hasVNEnglish) {
             infoVNEnglish.hide();
         }
-        if (!song.visualnovel.romaji || song.visualnovel.romaji.trim() === "") {
+        if (!hasVNRomaji) {
             infoVNRomaji.hide();
+        }
+
+        // Center the title if only one of VN English or VN Romaji exists
+        if (hasVNEnglish !== hasVNRomaji) {
+            infoRow0.addClass("slInfoRowCentered");
         }
 
         infoRow0.append(infoVNEnglish);

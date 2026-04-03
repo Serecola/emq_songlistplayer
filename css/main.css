@@ -501,6 +501,10 @@ tr.header > td {
     text-align: center;
     clear: both;
 }
+.slInfoRowCentered > div {
+    margin: 1% auto;
+    float: none;
+}
 .slInfoRow > div {
     margin: 1%;
     text-align: center;
