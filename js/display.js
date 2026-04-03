@@ -237,10 +237,47 @@ function updateGuessTypeDropdown(quizIndex) {
 }
 
 function updateScoreboard(selectedSong) {
-    if (!importData || !selectedSong) return;
-
     let container = document.getElementById('slScoreboardContainer');
     container.innerHTML = '';
+    
+    if (!importData || !selectedSong) {
+        // Initial load: show all players with 0 score
+        let allPlayers = {};
+        importData.forEach(song => {
+            song.players.forEach(player => {
+                if (!allPlayers[player.name]) {
+                    allPlayers[player.name] = 0;
+                }
+            });
+        });
+        
+        let scores = Object.entries(allPlayers)
+            .map(([name, score]) => ({ name, correct: score, total: 0 }))
+            .sort((a, b) => b.correct - a.correct);
+        
+        scores.forEach((player, index) => {
+            let entry = document.createElement('div');
+            entry.className = 'slScoreboardEntry';
+            
+            let rank = document.createElement('span');
+            rank.className = 'slScoreboardRank';
+            rank.textContent = (index + 1) + '.';
+            
+            let name = document.createElement('span');
+            name.className = 'slScoreboardName';
+            name.textContent = player.name;
+            
+            let score = document.createElement('span');
+            score.className = 'slScoreboardScore';
+            score.textContent = player.correct + ' / ' + player.total;
+            
+            entry.appendChild(rank);
+            entry.appendChild(name);
+            entry.appendChild(score);
+            container.appendChild(entry);
+        });
+        return;
+    }
 
     let progressiveScores = {};
     let selectedSongIndex = selectedSong.songid;
