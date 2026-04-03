@@ -189,6 +189,14 @@ body {
     padding: 0;
     line-height: 1;
 }
+.slMediaBtn svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+.slMediaBtn:hover svg {
+    fill: #d9d9d9;
+}
 .slMediaBtn:hover {
     color: #d9d9d9;
     background: rgba(255,255,255,0.08);
@@ -202,6 +210,10 @@ body {
     height: 36px;
     color: #B6FF00;
     border: 1.5px solid rgba(182,255,0,0.4);
+}
+#slPlayPauseBtn svg {
+    width: 18px;
+    height: 18px;
 }
 #slPlayPauseBtn:hover {
     color: #B6FF00;
