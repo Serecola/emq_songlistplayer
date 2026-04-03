@@ -440,11 +440,11 @@ tr.header > td {
     min-width: 28px;
     flex-shrink: 0;
     text-align: center;
-    padding: 1px 4px;
+    color: #d9d9d9;
 }
 .slScoreboardScore.hasScore {
-    color: #B6FF00;
-    text-shadow: 0 0 5px #fff, 0 0 10px #B6FF00, 0 0 15px #B6FF00;
+    color: #fff;
+    text-shadow: 0 0 5px #B6FF00, 0 0 10px #B6FF00, 0 0 15px #B6FF00;
 }
 .slScoreboardScore.noScore {
     color: #d9d9d9;
