@@ -9,6 +9,9 @@ __pycache__/
 *.so
 *.a
 *.out
+dist/
+build/
+target/
 
 # Dependencies
 node_modules/
@@ -32,20 +35,10 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Coverage and testing
-.coverage
+# Coverage
 coverage/
 htmlcov/
-
-# Build directories
-dist/
-build/
-target/
-.gradle/
-
-# Python specific
-.mypy_cache/
-.pytest_cache/
+.coverage
 
 # Compressed files
 *.zip
@@ -70,4 +63,25 @@ target/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
+
+# Python specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg-info/
+.eggs/
+.mypy_cache/
+.pytest_cache/
+
+# Gradle
+.gradle/
+
+# MyPy cache
+.mypy_cache/
+
+# PyTest cache
+.pytest_cache/
 ```

@@ -332,13 +332,13 @@ function updateInfo(song) {
     stopsong();
     clearInfo();
     if (song !== undefined) {
+        let infoRow0 = $("<div></div>")
+            .attr("class", "slInfoRow");
         let infoRow1 = $("<div></div>")
             .attr("class", "slInfoRow");
         let infoRow2 = $("<div></div>")
             .attr("class", "slInfoRow");
         let infoRow3 = $("<div></div>")
-            .attr("class", "slInfoRow");
-        let infoRow4 = $("<div></div>")
             .attr("class", "slInfoRow");
 
         let correctGuesses = song.correctCount || song.players.filter((tmpPlayer) => tmpPlayer.correct === true).length;
@@ -374,10 +374,10 @@ function updateInfo(song) {
             .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
         let infoVNEnglish = $("<div></div>")
             .attr("id", "slInfoVNEnglish")
-            .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
+            .html("<h5><b>VN English</b></h5><p>" + (song.visualnovel.english || "") + "</p>");
         let infoVNRomaji = $("<div></div>")
             .attr("id", "slInfoVNRomaji")
-            .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
+            .html("<h5><b>VN Romaji</b></h5><p>" + (song.visualnovel.romaji || "") + "</p>");
         let infoType = $("<div></div>")
             .attr("id", "slInfoType")
             .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
@@ -391,17 +391,25 @@ function updateInfo(song) {
             .attr("id", "slInfoUrls")
             .html("<h5><b>URLs</b></h5>");
 
+        // Hide VN English or VN Romaji if they don't exist
+        if (!song.visualnovel.english || song.visualnovel.english.trim() === "") {
+            infoVNEnglish.hide();
+        }
+        if (!song.visualnovel.romaji || song.visualnovel.romaji.trim() === "") {
+            infoVNRomaji.hide();
+        }
+
+        infoRow0.append(infoVNEnglish);
+        infoRow0.append(infoVNRomaji);
+
         infoRow1.append(infoSongName);
         infoRow1.append(infoArtist);
         infoRow1.append(infoType);
 
-        infoRow2.append(infoVNEnglish);
-        infoRow2.append(infoVNRomaji);
+        infoRow2.append(infoUrls);
 
-        infoRow3.append(infoUrls);
-
-        infoRow4.append(infoGuessed);
-        infoRow4.append(infoFromList);
+        infoRow3.append(infoGuessed);
+        infoRow3.append(infoFromList);
 
         let infoListContainer;
         if (song.fromList.length === 0) {
@@ -501,7 +509,7 @@ function updateInfo(song) {
 						$("<a></a>")
 							.attr("href", shortestVideo.Url)
 							.attr("target", "_blank")
-							.text(shortestVideo.Url),
+							.text(truncateUrl(shortestVideo.Url)),
 						$("<span></span>").text(` (${formatDuration(shortestVideo.Duration)})`)
 					)
 				);
@@ -514,7 +522,7 @@ function updateInfo(song) {
 						$("<a></a>")
 							.attr("href", shortestAudio.Url)
 							.attr("target", "_blank")
-							.text(shortestAudio.Url),
+							.text(truncateUrl(shortestAudio.Url)),
 						$("<span></span>").text(` (${formatDuration(shortestAudio.Duration)})`)
 					)
 				);
@@ -532,10 +540,10 @@ function updateInfo(song) {
 		}
 		infoUrls.append(infoListContainer);
 
+        $("#slInfoBody").append(infoRow0);
         $("#slInfoBody").append(infoRow1);
         $("#slInfoBody").append(infoRow2);
         $("#slInfoBody").append(infoRow3);
-        $("#slInfoBody").append(infoRow4);
     }
     song = cursongdata;
 
@@ -597,6 +605,14 @@ function clearInfo() {
 
 function clearScoreboard() {
     $(".slScoreboardEntry").remove();
+}
+
+function truncateUrl(url) {
+    if (!url) return url;
+    // Extract the filename/UUID part from URLs like:
+    // https://erogemusicquiz.com/selfhoststorage/userup/weba/9f4e9ee8-bd16-4f1a-aca6-2ebaca2a34cf.weba
+    const parts = url.split('/');
+    return parts.length > 0 ? parts[parts.length - 1] : url;
 }
 
 function formatUrl(src) {

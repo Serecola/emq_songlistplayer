@@ -523,11 +523,11 @@ tr.header > td {
     overflow-wrap: break-word; 
 }
 #slInfoVNEnglish {
-    width: 100%;
+    width: 48%;
     overflow-wrap: break-word;
 }
 #slInfoVNRomaji {
-    width: 100%;
+    width: 48%;
     overflow-wrap: break-word;
 }
 #slInfoUrls {
