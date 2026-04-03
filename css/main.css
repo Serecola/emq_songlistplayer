@@ -519,25 +519,30 @@ tr.header > td {
     font-weight: bold;
     font-size: 16px;
 }
-#slInfoSongName {
-    width: 38%;
-    overflow-wrap: break-word;
-}
-#slInfoArtist {
-    width: 38%;
-    overflow-wrap: break-word;
-}
-#slInfoType{
+#slInfoVNRomaji {
     width: 18%;
-    overflow-wrap: break-word; 
+    overflow-wrap: break-word;
+    float: left;
 }
 #slInfoVNEnglish {
-    width: 100%;
+    width: 18%;
     overflow-wrap: break-word;
+    float: left;
 }
-#slInfoVNRomaji {
-    width: 100%;
+#slInfoSongName {
+    width: 20%;
     overflow-wrap: break-word;
+    float: left;
+}
+#slInfoArtist {
+    width: 20%;
+    overflow-wrap: break-word;
+    float: left;
+}
+#slInfoType{
+    width: 20%;
+    overflow-wrap: break-word;
+    float: left;
 }
 #slInfoUrls {
     width: 100%;

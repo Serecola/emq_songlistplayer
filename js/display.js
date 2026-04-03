@@ -8,8 +8,8 @@ function loadData() {
     $("#slTable").show();
     $("#slScoreboard").show();
     $("#slInfo").show();
-    clearInfo();
-    clearScoreboard();
+    clearSelection();
+    updateScoreboardHighlight("");
     $("tr.songData, tr.quizSeparator").remove();
     let songid = 0;
     let lastQuizIndex = -1;
@@ -98,14 +98,12 @@ function loadData() {
                     updateTableGuesses($("#slPlayerName").val());
                     updateScoreboard(song);
                     updateInfo(song);
+                    updateScoreboardHighlight($("#slPlayerName").val());
                     repeat = repeatcount = $("#slRepeat").val() * 1;
                     repeatcount--;
                 }
                 else {
-                    $(".selected").removeClass("selected");
-                    clearScoreboard();
-                    clearInfo();
-                    stopsong();
+                    clearSelection();
                 }
             })
             .hover(function () {
@@ -330,7 +328,7 @@ function updateInfo(song) {
         prevsong = undefined;
     }
     stopsong();
-    clearInfo();
+    clearSelection();
     if (song !== undefined) {
         let infoRow1 = $("<div></div>")
             .attr("class", "slInfoRow");
@@ -366,18 +364,18 @@ function updateInfo(song) {
 			return player.name + " " + total + " (+" + perSong + ")";
 		}
 
+        let infoVNRomaji = $("<div></div>")
+            .attr("id", "slInfoVNRomaji")
+            .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
+        let infoVNEnglish = $("<div></div>")
+            .attr("id", "slInfoVNEnglish")
+            .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
         let infoSongName = $("<div></div>")
             .attr("id", "slInfoSongName")
             .html("<h5><b>Song Name</b></h5><p>" + song.name + "</p>");
         let infoArtist = $("<div></div>")
             .attr("id", "slInfoArtist")
             .html("<h5><b>Artist</b></h5><p>" + song.artist + "</p>");
-        let infoVNEnglish = $("<div></div>")
-            .attr("id", "slInfoVNEnglish")
-            .html("<h5><b>VN English</b></h5><p>" + song.visualnovel.english + "</p>");
-        let infoVNRomaji = $("<div></div>")
-            .attr("id", "slInfoVNRomaji")
-            .html("<h5><b>VN Romaji</b></h5><p>" + song.visualnovel.romaji + "</p>");
         let infoType = $("<div></div>")
             .attr("id", "slInfoType")
             .html("<h5><b>Type</b></h5><p>" + song.type + "</p>");
@@ -391,14 +389,15 @@ function updateInfo(song) {
             .attr("id", "slInfoUrls")
             .html("<h5><b>URLs</b></h5>");
 
+        infoRow1.append(infoVNRomaji);
+        if (song.visualnovel.english && song.visualnovel.english.trim() !== "") {
+            infoRow1.append(infoVNEnglish);
+        }
         infoRow1.append(infoSongName);
         infoRow1.append(infoArtist);
         infoRow1.append(infoType);
 
-        infoRow2.append(infoVNEnglish);
-        infoRow2.append(infoVNRomaji);
-
-        infoRow3.append(infoUrls);
+        infoRow2.append(infoUrls);
 
         infoRow4.append(infoGuessed);
         infoRow4.append(infoFromList);
@@ -534,7 +533,6 @@ function updateInfo(song) {
 
         $("#slInfoBody").append(infoRow1);
         $("#slInfoBody").append(infoRow2);
-        $("#slInfoBody").append(infoRow3);
         $("#slInfoBody").append(infoRow4);
     }
     song = cursongdata;
@@ -591,12 +589,20 @@ function updateInfo(song) {
 }
 var nextsongtimer = null;
 
+function clearScoreboard() {
+    $(".slScoreboardEntry").remove();
+}
+
 function clearInfo() {
     $("#slInfoBody").children().remove();
 }
 
-function clearScoreboard() {
-    $(".slScoreboardEntry").remove();
+function clearSelection() {
+    $(".selected").removeClass("selected");
+    clearScoreboard();
+    clearInfo();
+    stopsong();
+    updateScoreboardHighlight("");
 }
 
 function formatUrl(src) {
