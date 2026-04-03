@@ -307,7 +307,7 @@ function updateScoreboard(selectedSong) {
 function updateScoreboardHighlight(playerName) {
     document.querySelectorAll('.slScoreboardEntry').forEach(entry => {
         entry.classList.remove('highlight');
-        if (entry.querySelector('.slScoreboardName').textContent === playerName) {
+        if (playerName && playerName.trim() !== "" && entry.querySelector('.slScoreboardName').textContent === playerName) {
             entry.classList.add('highlight');
         }
     });
@@ -335,8 +335,6 @@ function updateInfo(song) {
         let infoRow2 = $("<div></div>")
             .attr("class", "slInfoRow");
         let infoRow3 = $("<div></div>")
-            .attr("class", "slInfoRow");
-        let infoRow4 = $("<div></div>")
             .attr("class", "slInfoRow");
 
         let correctGuesses = song.correctCount || song.players.filter((tmpPlayer) => tmpPlayer.correct === true).length;
@@ -393,14 +391,9 @@ function updateInfo(song) {
         if (song.visualnovel.english && song.visualnovel.english.trim() !== "") {
             infoRow1.append(infoVNEnglish);
         }
-        infoRow1.append(infoSongName);
-        infoRow1.append(infoArtist);
-        infoRow1.append(infoType);
-
-        infoRow2.append(infoUrls);
-
-        infoRow4.append(infoGuessed);
-        infoRow4.append(infoFromList);
+        infoRow2.append(infoSongName);
+        infoRow2.append(infoArtist);
+        infoRow2.append(infoType);
 
         let infoListContainer;
         if (song.fromList.length === 0) {
@@ -531,9 +524,14 @@ function updateInfo(song) {
 		}
 		infoUrls.append(infoListContainer);
 
+        let infoRow3 = $("<div></div>")
+            .attr("class", "slInfoRow");
+        infoRow3.append(infoGuessed);
+        infoRow3.append(infoFromList);
+
         $("#slInfoBody").append(infoRow1);
         $("#slInfoBody").append(infoRow2);
-        $("#slInfoBody").append(infoRow4);
+        $("#slInfoBody").append(infoRow3);
     }
     song = cursongdata;
 
@@ -602,7 +600,7 @@ function clearSelection() {
     clearScoreboard();
     clearInfo();
     stopsong();
-    updateScoreboardHighlight("");
+    updateScoreboardHighlight($("#slPlayerName").val());
 }
 
 function formatUrl(src) {
