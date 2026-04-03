@@ -265,6 +265,13 @@ function updateScoreboard(selectedSong) {
         });
     }
 
+    // Get the current song's player results for per-song correctness
+    let currentSongPlayers = {};
+    selectedSong.players.forEach(player => {
+        let correct = (player.categoryCorrect !== undefined) ? player.categoryCorrect : (player.correct ? 1 : 0);
+        currentSongPlayers[player.name] = correct;
+    });
+
     let scores = Object.entries(progressiveScores)
         .map(([name, stats]) => ({ name, correct: stats.correct, total: stats.total }))
         .sort((a, b) => b.correct - a.correct);
@@ -279,12 +286,13 @@ function updateScoreboard(selectedSong) {
 
         let score = document.createElement('span');
         score.className = 'slScoreboardScore';
-        if (player.correct > 0) {
+        let songCorrect = currentSongPlayers[player.name] || 0;
+        if (songCorrect > 0) {
             score.classList.add('hasScore');
             score.textContent = `${player.correct}`;
         } else {
             score.classList.add('noScore');
-            score.textContent = '';
+            score.textContent = `${player.correct}`;
         }
 
         let name = document.createElement('span');
